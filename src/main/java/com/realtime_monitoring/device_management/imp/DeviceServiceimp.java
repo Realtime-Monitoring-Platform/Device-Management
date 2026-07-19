@@ -1,5 +1,6 @@
 package com.realtime_monitoring.device_management.imp;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -33,14 +34,17 @@ public class DeviceServiceimp implements DeviceService{
 
     @Override
     public void deleteDevice(UUID deviceId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteDevice'");
+        this.deviceRepository.deleteById(deviceId);
     }
 
     @Override
     public DeviceResponse getDEviceById(UUID deviceId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDEviceById'");
+        Optional<Device> device = this.deviceRepository.findById(deviceId);
+        if(device.isEmpty()){
+            throw new RuntimeException("device not found");
+        }
+        DeviceResponse deviceReponse = this.deviceMapper.toResponse(device.get());
+        return deviceReponse;
     }
 
     @Override
