@@ -1,14 +1,34 @@
 package com.realtime_monitoring.device_management.dto;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.realtime_monitoring.device_management.entity.DeviceStatus;
 
 public class UpdateDeviceRequest {
-    private String deviceName;
+
+    private UUID id;
+    private UUID tenantId;
     private UUID teamId;
-    private UUID assignedUserId;
-    private String location;
+    private String deviceName;
+    private String serialNumber;
+    private String hostname;
+    private String manufacturer;
+    private String model;
+
+    private String macAddress;
+
+    private String ipAddress;
+
+    private String firmwareVersion;
+
+    private String agentVersion;
+
     private DeviceStatus status;
-    
+
+
+    private LocalDateTime lastSeen;
+
+    private LocalDateTime createdAt;
+
 }
