@@ -51,8 +51,8 @@ public class Device {
 
     private String location;
 
-    // @Enumerated(EnumType.STRING)
-    // private DeviceStatus status;
+    @Enumerated(EnumType.STRING)
+    private DeviceStatus status;
 
     private LocalDateTime lastSeen;
 
