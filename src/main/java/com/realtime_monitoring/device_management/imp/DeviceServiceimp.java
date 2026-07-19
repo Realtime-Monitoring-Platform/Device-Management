@@ -49,8 +49,12 @@ public class DeviceServiceimp implements DeviceService{
 
     @Override
     public DeviceResponse updateDevice(UUID id, UpdateDeviceRequest updateDeviceRequest) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateDevice'");
+        Optional<Device> device = this.deviceRepository.findById(id);
+        if(device.isEmpty()){
+            throw new RuntimeException("device not found");
+        }
+        Device updatedDevice = deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device.get());
+        return deviceMapper.toResponse(this.deviceRepository.save(updatedDevice));
     }
 
     @Override
