@@ -15,12 +15,13 @@ import com.realtime_monitoring.device_management.mapper.DeviceMapper;
 import com.realtime_monitoring.device_management.repository.DeviceRepository;
 import com.realtime_monitoring.device_management.service.DeviceService;
 
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 
 @RequiredArgsConstructor
 @Service
-
+@Transactional
 public class DeviceServiceimp implements DeviceService{
 
     private final DeviceRepository deviceRepository;
@@ -38,6 +39,7 @@ public class DeviceServiceimp implements DeviceService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DeviceResponse getDEviceById(UUID deviceId) {
         Optional<Device> device = this.deviceRepository.findById(deviceId);
         if(device.isEmpty()){
@@ -58,6 +60,7 @@ public class DeviceServiceimp implements DeviceService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<DeviceResponse> getAllDevices(Pageable pageable) {
         Page<DeviceResponse> devices = this.deviceRepository.findAll(pageable).map(deviceMapper::toResponse);
         return devices;
