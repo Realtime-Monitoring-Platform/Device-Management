@@ -59,8 +59,8 @@ public class DeviceServiceimp implements DeviceService{
 
     @Override
     public Page<DeviceResponse> getAllDevices(Pageable pageable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllDevices'");
+        Page<DeviceResponse> devices = this.deviceRepository.findAll(pageable).map(deviceMapper::toResponse);
+        return devices;
     }
     
 }
