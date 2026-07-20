@@ -5,9 +5,15 @@ import java.util.UUID;
 
 import com.realtime_monitoring.device_management.entity.DeviceStatus;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateDeviceRequest {
 
-    private UUID id;
     private UUID tenantId;
     private UUID teamId;
     private String deviceName;
@@ -29,6 +35,5 @@ public class UpdateDeviceRequest {
 
     private LocalDateTime lastSeen;
 
-    private LocalDateTime createdAt;
 
 }

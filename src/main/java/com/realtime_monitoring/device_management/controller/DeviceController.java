@@ -44,7 +44,7 @@ public class DeviceController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<DeviceResponse>> getAllDevices(@PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable) {
+    public ResponseEntity<Page<DeviceResponse>> getAllDevices(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         return ResponseEntity.ok(deviceService.getAllDevices(pageable));
     }
 

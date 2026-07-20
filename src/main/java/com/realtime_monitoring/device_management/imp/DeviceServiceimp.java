@@ -53,9 +53,7 @@ public class DeviceServiceimp implements DeviceService{
     @Override
     public DeviceResponse updateDevice(UUID id, UpdateDeviceRequest updateDeviceRequest) {
         Device device = this.deviceRepository.findById(id).orElseThrow(
-            () -> new DeviceNotFoundException("device with ID " + id + " not found")
-        );
-
+            () -> new DeviceNotFoundException("device with ID " + id + " not found"));
     
         deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device);
         return deviceMapper.toResponse(this.deviceRepository.save(device));
