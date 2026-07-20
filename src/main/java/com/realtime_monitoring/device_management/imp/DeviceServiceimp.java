@@ -52,12 +52,13 @@ public class DeviceServiceimp implements DeviceService{
 
     @Override
     public DeviceResponse updateDevice(UUID id, UpdateDeviceRequest updateDeviceRequest) {
-        Optional<Device> device = this.deviceRepository.findById(id);
-        if(device.isEmpty()){
-            throw new DeviceNotFoundException("device with ID " + id + " not found");
-        }
-        Device updatedDevice = deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device.get());
-        return deviceMapper.toResponse(this.deviceRepository.save(updatedDevice));
+        Device device = this.deviceRepository.findById(id).orElseThrow(
+            () -> new DeviceNotFoundException("device with ID " + id + " not found")
+        );
+
+    
+        deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device);
+        return deviceMapper.toResponse(this.deviceRepository.save(device));
     }
 
     @Override
