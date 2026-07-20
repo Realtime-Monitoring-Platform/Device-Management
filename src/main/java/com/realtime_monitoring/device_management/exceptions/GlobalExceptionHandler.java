@@ -17,14 +17,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DeviceNotFoundException.class)
     public ResponseEntity<?> handleDeviceNotFoundException(DeviceNotFoundException exception){
-        ErrorResponse productNotFound = new ErrorResponse(LocalDateTime.now(), exception.getMessage(), "Product Not Found");
-        return new ResponseEntity<>(productNotFound, HttpStatus.NOT_FOUND);
+        ErrorResponse deviceNotFound = new ErrorResponse(LocalDateTime.now(), exception.getMessage(), "Device Not Found");
+        return new ResponseEntity<>(deviceNotFound, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ArrayIndexOutOfBoundsException.class)
     public ResponseEntity<?> handleDeviceNotFoundException(ArrayIndexOutOfBoundsException exception){
-        ErrorResponse productNotFound = new ErrorResponse(LocalDateTime.now(), exception.getMessage(), "Product Not Found");
-        return new ResponseEntity<>(productNotFound, HttpStatus.NOT_FOUND);
+        ErrorResponse deviceNotFound = new ErrorResponse(LocalDateTime.now(), exception.getMessage(), "Device Not Found");
+        return new ResponseEntity<>(deviceNotFound, HttpStatus.NOT_FOUND);
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
