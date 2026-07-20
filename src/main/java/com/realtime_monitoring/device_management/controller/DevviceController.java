@@ -40,7 +40,8 @@ public class DevviceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DeviceResponse> getDevice(@PathVariable UUID id) {
-        return ResponseEntity.ok(deviceService.getDEviceById(id));
+        DeviceResponse deviceResponse = deviceService.getDEviceById(id);
+        return ResponseEntity.ok(deviceResponse);
     }
 
     @GetMapping

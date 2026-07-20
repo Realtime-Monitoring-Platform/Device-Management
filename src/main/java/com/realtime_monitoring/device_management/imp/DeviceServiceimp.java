@@ -11,6 +11,7 @@ import com.realtime_monitoring.device_management.dto.CreateDeviecRequest;
 import com.realtime_monitoring.device_management.dto.DeviceResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 import com.realtime_monitoring.device_management.entity.Device;
+import com.realtime_monitoring.device_management.exceptions.DeviceNotFoundException;
 import com.realtime_monitoring.device_management.mapper.DeviceMapper;
 import com.realtime_monitoring.device_management.repository.DeviceRepository;
 import com.realtime_monitoring.device_management.service.DeviceService;
@@ -43,7 +44,7 @@ public class DeviceServiceimp implements DeviceService{
     public DeviceResponse getDEviceById(UUID deviceId) {
         Optional<Device> device = this.deviceRepository.findById(deviceId);
         if(device.isEmpty()){
-            throw new RuntimeException("device not found");
+            throw new DeviceNotFoundException("device with ID " + deviceId + " not found");
         }
         DeviceResponse deviceReponse = this.deviceMapper.toResponse(device.get());
         return deviceReponse;
@@ -53,7 +54,7 @@ public class DeviceServiceimp implements DeviceService{
     public DeviceResponse updateDevice(UUID id, UpdateDeviceRequest updateDeviceRequest) {
         Optional<Device> device = this.deviceRepository.findById(id);
         if(device.isEmpty()){
-            throw new RuntimeException("device not found");
+            throw new DeviceNotFoundException("device with ID " + id + " not found");
         }
         Device updatedDevice = deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device.get());
         return deviceMapper.toResponse(this.deviceRepository.save(updatedDevice));
