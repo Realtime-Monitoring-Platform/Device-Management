@@ -17,7 +17,6 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 
-
 @Data
 @Builder
 public class DeviceResponse {
@@ -27,9 +26,7 @@ public class DeviceResponse {
 
     @Column(nullable = false)
     private UUID tenantId;
-
     private UUID teamId;
-
     private UUID assignedUserId;
 
     @Column(nullable = false)
@@ -43,9 +40,7 @@ public class DeviceResponse {
     private String hostname;
 
     private String ipAddress;
-
     private String macAddress;
-
     private String location;
 
     @Enumerated(EnumType.STRING)

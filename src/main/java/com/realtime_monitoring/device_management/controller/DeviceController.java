@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("api/v1/devices")
 @RequiredArgsConstructor
-public class DevviceController {
+public class DeviceController {
     private final DeviceService deviceService;
 
     @PostMapping
