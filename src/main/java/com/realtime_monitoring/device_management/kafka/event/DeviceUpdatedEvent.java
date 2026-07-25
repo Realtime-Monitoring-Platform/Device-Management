@@ -1,4 +1,4 @@
-package com.realtime_monitoring.device_management.event;
+package com.realtime_monitoring.device_management.kafka.event;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,5 +17,8 @@ public record DeviceUpdatedEvent(
         String macAddress,
         String location,
         DeviceStatus status,
-        LocalDateTime lastSeen) {
+        LocalDateTime lastSeen,
+        UUID tenantId,
+        UUID teamId
+) {
 }

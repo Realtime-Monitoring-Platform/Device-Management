@@ -40,6 +40,7 @@ public class DeviceServiceimp implements DeviceService{
     @Override
     public void deleteDevice(UUID deviceId) {
         this.deviceRepository.deleteById(deviceId);
+        this.deviceProducer.sendDeviceDeleted(deviceId);
     }
 
     @Override

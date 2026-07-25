@@ -1,4 +1,5 @@
 package com.realtime_monitoring.device_management.kafka;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,6 @@ public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> config = new HashMap<>();
@@ -26,10 +26,9 @@ public class KafkaConfig {
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         config.put(JsonSerializer.TYPE_MAPPINGS,
-                "tenantCreated:com.realtime_monitorig.tenant_managment.kafka.event.TenantCreatedEvent," +
-                        "tenantUpdated:com.realtime_monitorig.tenant_managment.kafka.event.TenantUpdatedEvent," +
-                        "tenantDeleted:com.realtime_monitorig.tenant_managment.kafka.event.TenantDeletedEvent"
-                    );
+                "deviceCreated:com.realtime_monitoring.device_management.kafka.event.DeviceCreatedEvent," +
+                        "deviceUpdated:com.realtime_monitoring.device_management.kafka.event.DeviceUpdatedEvent," +
+                        "deviceDeleted:com.realtime_monitoring.device_management.kafka.event.DeviceDeletedEvent");
         return new DefaultKafkaProducerFactory<>(config);
     }
 

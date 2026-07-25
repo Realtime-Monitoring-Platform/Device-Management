@@ -17,17 +17,17 @@ spring:
         database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
     kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-         spring.json.add.type.info: false
-         spring.json.type.mapping: >
-           deviceCreated:com.realtime_monitoring.device_management.kafka.event.DeviceCreatedEvent,
-           deviceUpdated:com.realtime_monitoring.device_management.kafka.event.DeviceUpdatedEvent,
-           deviceDeleted:com.realtime_monitoring.device_management.kafka.event.DeviceDeletedEvent
-    # kafka:
+        bootstrap-servers: localhost:9092
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+                spring.json.add.type.info: false
+                spring.json.type.mapping: >
+                    deviceCreated:com.realtime_monitoring.device_management.kafka.event.DeviceCreatedEvent,
+                    deviceUpdated:com.realtime_monitoring.device_management.kafka.event.DeviceUpdatedEvent,
+                    deviceDeleted:com.realtime_monitoring.device_management.kafka.event.DeviceDeletedEvent
+        # kafka:
     #     bootstrap-servers: localhost:9092
     #     producer:
     #         key-serializer: org.apache.kafka.common.serialization.StringSerializer

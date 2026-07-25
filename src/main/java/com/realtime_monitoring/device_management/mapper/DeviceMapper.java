@@ -9,10 +9,12 @@ import com.realtime_monitoring.device_management.dto.DeviceResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 import com.realtime_monitoring.device_management.entity.Device;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = MappingConstants.ComponentModel.SPRING,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 
 public interface DeviceMapper {
