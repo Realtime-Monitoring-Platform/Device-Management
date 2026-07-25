@@ -12,13 +12,13 @@ import com.realtime_monitoring.device_management.dto.DeviceResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 import com.realtime_monitoring.device_management.entity.Device;
 import com.realtime_monitoring.device_management.exceptions.DeviceNotFoundException;
+import com.realtime_monitoring.device_management.kafka.DeviceProducer;
 import com.realtime_monitoring.device_management.mapper.DeviceMapper;
 import com.realtime_monitoring.device_management.repository.DeviceRepository;
 import com.realtime_monitoring.device_management.service.DeviceService;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-
 
 @RequiredArgsConstructor
 @Service
@@ -27,11 +27,14 @@ public class DeviceServiceimp implements DeviceService{
 
     private final DeviceRepository deviceRepository;
     private final DeviceMapper deviceMapper;
+    private final DeviceProducer deviceProducer;
 
     @Override
     public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
         Device device= deviceMapper.toEntity(createDeviceRequest);
-        return deviceMapper.toResponse(this.deviceRepository.save(device));
+        Device savedDevice= deviceRepository.save(device);
+        deviceProducer.sendDeviceCreation(savedDevice);
+        return deviceMapper.toResponse(savedDevice);
     }
 
     @Override
@@ -56,7 +59,9 @@ public class DeviceServiceimp implements DeviceService{
             () -> new DeviceNotFoundException("device with ID " + id + " not found"));
     
         deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device);
-        return deviceMapper.toResponse(this.deviceRepository.save(device));
+        Device updatedDevice = this.deviceRepository.save(device);
+        deviceProducer.sendDeviceUpdate(updatedDevice);
+        return deviceMapper.toResponse(updatedDevice);
     }
 
     @Override
