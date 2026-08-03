@@ -5,7 +5,7 @@ spring:
         config:
             enabled: false
     application:
-        name: device_management
+        name: device-service
     datasource:
         driver-class-name: org.postgresql.Driver
         url: jdbc:postgresql://localhost:5432/device_management

@@ -47,7 +47,7 @@ public class DeviceProducer {
                                 device.getTeamId());
 
                 log.info("sending device creation event:::::::::::::::::::::::::::::: {}", deviceEvent);
-                kafkaTemplate.send("device-events-v5", device.getId().toString(), deviceEvent);
+                kafkaTemplate.send("device-events-v6", device.getId().toString(), deviceEvent);
         }
 
         public void sendDeviceUpdate(Device device) {
@@ -75,7 +75,7 @@ public class DeviceProducer {
                                 device.getTeamId());
 
                 log.info("sending device update event: {}", deviceEvent);
-                kafkaTemplate.send("device-events-v5", device.getId().toString(), deviceEvent);
+                kafkaTemplate.send("device-events-v6", device.getId().toString(), deviceEvent);
         }
 
         public void sendDeviceDeleted(UUID deviceId) {
@@ -94,7 +94,7 @@ public class DeviceProducer {
                 log.info("Sending device deletion event: {}", deviceEvent);
 
                 kafkaTemplate.send(
-                                "device-events-v5",
+                                "device-events-v6",
                                 deviceId.toString(),
                                 deviceEvent);
         }
