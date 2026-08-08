@@ -57,6 +57,9 @@ public class Device {
     private DeviceStatus status;
 
     private LocalDateTime lastSeen;
+    private String MqttUsername;
+    private String mqttPassword;
+    private String mqttHashPassword;
 
     @CreationTimestamp
     @Column(updatable = false)

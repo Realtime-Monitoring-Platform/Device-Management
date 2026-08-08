@@ -3,6 +3,7 @@ package com.realtime_monitoring.device_management.imp;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.kafka.common.config.types.Password;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class DeviceServiceimp implements DeviceService{
+public class DeviceServiceimp implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final DeviceMapper deviceMapper;
@@ -31,8 +32,17 @@ public class DeviceServiceimp implements DeviceService{
 
     @Override
     public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
-        Device device= deviceMapper.toEntity(createDeviceRequest);
-        Device savedDevice= deviceRepository.save(device);
+        Device device = deviceMapper.toEntity(createDeviceRequest);
+        String generatedPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        device.setMqttPassword(generatedPassword);
+        device.setMqttUsername(GeneratedId);
+        System.out.println("Generated Password: " + generatedPassword);
+        String hashedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(generatedPassword,
+                org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
+        device.setMqttHashPassword(hashedPassword);
+        Device savedDevice = deviceRepository.save(device);
+
         deviceProducer.sendDeviceCreation(savedDevice);
         return deviceMapper.toResponse(savedDevice);
     }
@@ -47,7 +57,7 @@ public class DeviceServiceimp implements DeviceService{
     @Transactional(readOnly = true)
     public DeviceResponse getDEviceById(UUID deviceId) {
         Optional<Device> device = this.deviceRepository.findById(deviceId);
-        if(device.isEmpty()){
+        if (device.isEmpty()) {
             throw new DeviceNotFoundException("device with ID " + deviceId + " not found");
         }
         DeviceResponse deviceReponse = this.deviceMapper.toResponse(device.get());
@@ -57,8 +67,8 @@ public class DeviceServiceimp implements DeviceService{
     @Override
     public DeviceResponse updateDevice(UUID id, UpdateDeviceRequest updateDeviceRequest) {
         Device device = this.deviceRepository.findById(id).orElseThrow(
-            () -> new DeviceNotFoundException("device with ID " + id + " not found"));
-    
+                () -> new DeviceNotFoundException("device with ID " + id + " not found"));
+
         deviceMapper.updateDeviceFromRequest(updateDeviceRequest, device);
         Device updatedDevice = this.deviceRepository.save(device);
         deviceProducer.sendDeviceUpdate(updatedDevice);
@@ -71,5 +81,5 @@ public class DeviceServiceimp implements DeviceService{
         Page<DeviceResponse> devices = this.deviceRepository.findAll(pageable).map(deviceMapper::toResponse);
         return devices;
     }
-    
+
 }

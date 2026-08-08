@@ -44,7 +44,12 @@ public class DeviceProducer {
                                 device.getLastSeen(),
 
                                 device.getTenantId(),
-                                device.getTeamId());
+                                device.getTeamId(),
+                                device.getMqttHashPassword(),
+                                device.getMqttPassword(),
+                                device.getMqttUsername()
+
+                );
 
                 log.info("sending device creation event:::::::::::::::::::::::::::::: {}", deviceEvent);
                 kafkaTemplate.send("device-events-v6", device.getId().toString(), deviceEvent);
@@ -72,7 +77,11 @@ public class DeviceProducer {
                                 device.getStatus(),
                                 device.getLastSeen(),
                                 device.getTenantId(),
-                                device.getTeamId());
+                                device.getTeamId(),
+                                device.getMqttHashPassword(),
+                                device.getMqttPassword(),
+                                device.getMqttUsername()
+                        );
 
                 log.info("sending device update event: {}", deviceEvent);
                 kafkaTemplate.send("device-events-v6", device.getId().toString(), deviceEvent);
