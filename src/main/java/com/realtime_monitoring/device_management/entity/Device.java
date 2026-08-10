@@ -32,11 +32,11 @@ public class Device {
 
     @Column(nullable = false)
     private UUID tenantId;
-
+    
     private UUID teamId;
-
+    
     private UUID assignedUserId;
-
+    
     @Column(nullable = false)
     private String deviceName;
 
@@ -50,7 +50,9 @@ public class Device {
     private String ipAddress;
 
     private String macAddress;
-
+ 
+    
+    
     private String location;
 
     @Enumerated(EnumType.STRING)
