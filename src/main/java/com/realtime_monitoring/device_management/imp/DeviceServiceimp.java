@@ -29,7 +29,7 @@ public class DeviceServiceimp implements DeviceService {
     private final DeviceRepository deviceRepository;
     private final DeviceMapper deviceMapper;
     private final DeviceProducer deviceProducer;
-
+    
     @Override
     public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
         Device device = deviceMapper.toEntity(createDeviceRequest);
