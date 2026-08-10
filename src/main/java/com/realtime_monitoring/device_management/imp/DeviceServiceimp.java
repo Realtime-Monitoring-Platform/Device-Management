@@ -12,10 +12,12 @@ import com.realtime_monitoring.device_management.dto.CreateDeviecRequest;
 import com.realtime_monitoring.device_management.dto.DeviceResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 import com.realtime_monitoring.device_management.entity.Device;
+import com.realtime_monitoring.device_management.entity.DeviceToken;
 import com.realtime_monitoring.device_management.exceptions.DeviceNotFoundException;
 import com.realtime_monitoring.device_management.kafka.DeviceProducer;
 import com.realtime_monitoring.device_management.mapper.DeviceMapper;
 import com.realtime_monitoring.device_management.repository.DeviceRepository;
+import com.realtime_monitoring.device_management.repository.DeviceTokenRepository;
 import com.realtime_monitoring.device_management.service.DeviceService;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -29,19 +31,28 @@ public class DeviceServiceimp implements DeviceService {
     private final DeviceRepository deviceRepository;
     private final DeviceMapper deviceMapper;
     private final DeviceProducer deviceProducer;
-    
+    private final DeviceTokenRepository deviceTokenRepo;
+
     @Override
     public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
         Device device = deviceMapper.toEntity(createDeviceRequest);
         String generatedPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+
         device.setMqttPassword(generatedPassword);
         device.setMqttUsername(GeneratedId);
         System.out.println("Generated Password: " + generatedPassword);
         String hashedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(generatedPassword,
                 org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
         device.setMqttHashPassword(hashedPassword);
+
         Device savedDevice = deviceRepository.save(device);
+        DeviceToken deviceToken = new DeviceToken();
+        String Generatedtoken = UUID.randomUUID().toString() + "-" + System.currentTimeMillis();
+
+        deviceToken.setDevice(savedDevice);
+        deviceToken.setToken(Generatedtoken);
+        this.deviceTokenRepo.save(deviceToken);
 
         deviceProducer.sendDeviceCreation(savedDevice);
         return deviceMapper.toResponse(savedDevice);

@@ -2,6 +2,7 @@ package com.realtime_monitoring.device_management.entity;
 
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,8 +28,10 @@ public class DeviceToken {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String token;
-    private boolean used;
     
+    @Column(nullable = false)
+    private boolean used=false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", nullable = false)
     private Device device;
