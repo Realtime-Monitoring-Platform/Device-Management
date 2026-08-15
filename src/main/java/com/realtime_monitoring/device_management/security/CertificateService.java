@@ -220,7 +220,6 @@ public class CertificateService {
 
                 byte[] decoded = Base64.getDecoder().decode(key);
                 java.security.spec.PKCS8EncodedKeySpec spec = new java.security.spec.PKCS8EncodedKeySpec(decoded);
-
                 return java.security.KeyFactory.getInstance("RSA").generatePrivate(spec);
         }
 
