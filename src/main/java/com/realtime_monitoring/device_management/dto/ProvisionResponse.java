@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class ProvisionResponse {
+    private String tenantId;
     private String deviceId;
-    private String clientCerticate;
+    private String clientCertificate;
     private String caCertificate;
 }

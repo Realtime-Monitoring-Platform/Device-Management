@@ -1,5 +1,5 @@
 server:
-  port: 9005
+    port: 9005
 spring:
     cloud:
         config:
@@ -32,3 +32,18 @@ spring:
     #     producer:
     #         key-serializer: org.apache.kafka.common.serialization.StringSerializer
     #         value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+mqtt:
+    broker: ssl://192.168.1.122:8883
+    client-id: monitoring-backend
+    topic: tenants/+/devices/+/metrics
+    qos: 1
+    ca-cert: C:/mqtt/backend/ca.crt
+    client-cert: C:/mqtt/backend/backend.crt
+    client-key: C:/mqtt/backend/backend.key
+pki:
+  ca-cert: C:/mqtt/backend/ca/ca.crt
+  ca-key: C:/mqtt/backend/ca/ca.key
+#   ca-cert: C:\mqtt\backend\ca.crt
+#   client-cert: C:\mqtt\backend\backend.crt
+#   client-key: C:\mqtt\backend\backend.key

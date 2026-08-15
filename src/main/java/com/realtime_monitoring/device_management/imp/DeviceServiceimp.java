@@ -1,5 +1,7 @@
 package com.realtime_monitoring.device_management.imp;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.realtime_monitoring.device_management.dto.CreateDeviecRequest;
 import com.realtime_monitoring.device_management.dto.DeviceResponse;
+import com.realtime_monitoring.device_management.dto.ProvisionRequest;
+import com.realtime_monitoring.device_management.dto.ProvisionResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 import com.realtime_monitoring.device_management.entity.Device;
 import com.realtime_monitoring.device_management.entity.DeviceToken;
@@ -18,6 +22,7 @@ import com.realtime_monitoring.device_management.kafka.DeviceProducer;
 import com.realtime_monitoring.device_management.mapper.DeviceMapper;
 import com.realtime_monitoring.device_management.repository.DeviceRepository;
 import com.realtime_monitoring.device_management.repository.DeviceTokenRepository;
+import com.realtime_monitoring.device_management.security.CertificateService;
 import com.realtime_monitoring.device_management.service.DeviceService;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +37,16 @@ public class DeviceServiceimp implements DeviceService {
     private final DeviceMapper deviceMapper;
     private final DeviceProducer deviceProducer;
     private final DeviceTokenRepository deviceTokenRepo;
+    private final CertificateService certificateService;
 
+    // private final CertificateService certificateService;
     @Override
     public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
         Device device = deviceMapper.toEntity(createDeviceRequest);
         String generatedPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
-
+        String generatedIdentifier = UUID.randomUUID().toString();
+        device.setDeviceIdentifier(generatedIdentifier);
         device.setMqttPassword(generatedPassword);
         device.setMqttUsername(GeneratedId);
         System.out.println("Generated Password: " + generatedPassword);
@@ -92,5 +100,117 @@ public class DeviceServiceimp implements DeviceService {
         Page<DeviceResponse> devices = this.deviceRepository.findAll(pageable).map(deviceMapper::toResponse);
         return devices;
     }
+
+    @Override
+    public ProvisionResponse provisionDevice(
+            String token,
+            ProvisionRequest provisionRequest) {
+
+        System.out.println("========================================");
+        System.out.println("DEVICE PROVISIONING");
+        System.out.println("========================================");
+
+        System.out.println("Token from Rust agent: " + token);
+
+        DeviceToken deviceToken = deviceTokenRepo.findByToken(token)
+                .orElseThrow(() -> new DeviceNotFoundException(
+                        "Device token not found"));
+
+        Device device = deviceToken.getDevice();
+
+        System.out.println(
+                "Device ID: " + device.getId());
+
+        System.out.println(
+                "Tenant ID: " + device.getTenantId());
+
+  
+        if (provisionRequest == null ||
+                provisionRequest.getCsr() == null ||
+                provisionRequest.getCsr().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "CSR is required");
+        }
+
+        String csr = provisionRequest.getCsr();
+
+        System.out.println("CSR received from Rust agent.");
+
+      
+        try {
+
+            String clientCertificate = certificateService.signCsr(
+                    csr,
+                    device.getId().toString());
+
+            System.out.println(
+                    "Device certificate signed successfully.");
+
+
+            String caCertificate = Files.readString(
+                    Path.of(
+                            "C:/mqtt/backend/ca/ca.crt"));
+
+
+            ProvisionResponse response = new ProvisionResponse();
+
+            response.setDeviceId(
+                    device.getId().toString());
+
+            response.setTenantId(
+                    device.getTenantId().toString());
+
+            response.setCaCertificate(
+                    caCertificate);
+
+            response.setClientCertificate(
+                    clientCertificate);
+
+            System.out.println(
+                    "Provisioning response created.");
+
+            System.out.println("========================================");
+
+            return response;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Certificate provisioning failed.");
+
+            e.printStackTrace();
+
+            throw new RuntimeException(
+                    "Failed to provision device certificate",
+                    e);
+        }
+    }
+    // @Override
+    // public ProvisionResponse provisionDevice(String token, ProvisionRequest
+    // provisionRequest) {
+
+    // System.out.println("Token from Rust agent::::::::::::::: " + token);
+    // System.out.println("ProvisionRequest from Rust agent::::::::::::: " +
+    // provisionRequest);
+    // Optional<DeviceToken> deviceToken = deviceTokenRepo.findByToken(token);
+
+    // if (deviceToken.isEmpty()) {
+    // throw new DeviceNotFoundException("Device token not found");
+    // }
+
+    // Device device = deviceToken.get().getDevice();
+
+    // ProvisionResponse response = new ProvisionResponse();
+
+    // response.setDeviceId(device.getId().toString());
+    // response.setTenantId(device.getTenantId().toString());
+
+    // response.setCaCertificate("CA certificate");
+
+    // response.setClientCertificate("client certificate");
+
+    // return response;
+    // }
 
 }

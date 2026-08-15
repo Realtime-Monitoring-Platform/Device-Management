@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Entity
 @Getter
 @Setter
@@ -32,11 +33,11 @@ public class Device {
 
     @Column(nullable = false)
     private UUID tenantId;
-    
+
     private UUID teamId;
-    
+
     private UUID assignedUserId;
-    
+
     @Column(nullable = false)
     private String deviceName;
 
@@ -50,9 +51,10 @@ public class Device {
     private String ipAddress;
 
     private String macAddress;
- 
-    
-    
+
+    @Column(nullable = true, unique = true, updatable = false)
+    private String deviceIdentifier;
+
     private String location;
 
     @Enumerated(EnumType.STRING)
