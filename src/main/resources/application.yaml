@@ -50,5 +50,5 @@ pki:
 influxdb:
   url: http://localhost:8086
   token: chedlychedly
-  org: monitoring
+  org: docs
   bucket: chedly

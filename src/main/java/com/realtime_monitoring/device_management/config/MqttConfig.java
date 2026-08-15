@@ -15,7 +15,10 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 
-import com.influxdb.client.InfluxDBClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.realtime_monitoring.device_management.dto.DevicemEtrics;
+import com.realtime_monitoring.device_management.service.MetricsService;
 
 import javax.net.ssl.SSLContext;
 
@@ -23,9 +26,7 @@ import javax.net.ssl.SSLContext;
 @EnableIntegration
 public class MqttConfig {
 
-    @Autowired
-    private InfluxDBClient influxDBClient;
-
+   
     @Value("${mqtt.broker}")
     private String broker;
 
@@ -38,10 +39,16 @@ public class MqttConfig {
     @Value("${mqtt.qos}")
     private int qos;
 
+    private final ObjectMapper objectMapper;
     private final SSLContext sslContext;
+    private final MetricsService metricService;
 
-    public MqttConfig(@Qualifier("mqttSslContext") SSLContext sslContext) {
+    public MqttConfig(@Qualifier("mqttSslContext") SSLContext sslContext,
+            ObjectMapper objectMapper,
+            MetricsService MetricService) {
         this.sslContext = sslContext;
+        this.objectMapper = objectMapper;
+        this.metricService = MetricService;
     }
 
     @Bean
@@ -84,19 +91,43 @@ public class MqttConfig {
     @Bean
     public IntegrationFlow mqttMessageFlow(
             @Qualifier("mqttInputChannel") MessageChannel mqttInputChannel) {
-
+        // String payload = mqttInputChannel..getPayload().toString();
         return IntegrationFlow
                 .from(mqttInputChannel)
                 .handle(message -> {
-                    String payload = message.getPayload().toString();
-                    String receivedTopic = message.getHeaders()
-                            .get("mqtt_receivedTopic", String.class);
 
-                    System.out.println("========================================");
-                    System.out.println("MQTT MESSAGE RECEIVED");
-                    System.out.println("Topic: " + receivedTopic);
-                    System.out.println("Payload: " + payload);
-                    System.out.println("========================================");
+                    try {
+
+                        String payload = message.getPayload().toString();
+
+                        String receivedTopic = message.getHeaders()
+                                .get("mqtt_receivedTopic", String.class);
+
+                        System.out.println("========================================");
+                        System.out.println("MQTT MESSAGE RECEIVED");
+                        System.out.println("Topic: " + receivedTopic);
+                        System.out.println("Payload: " + payload);
+                        System.out.println("========================================");
+
+                        // JSON -> Java object
+                        DevicemEtrics metric = objectMapper.readValue(payload, DevicemEtrics.class);
+
+                        System.out.println("Device ID: " + metric.getDevice_id());
+                        System.out.println("Tenant ID: " + metric.getTenant_id());
+                        System.out.println("CPU: " + metric.getCpu());
+                        System.out.println("RAM: " + metric.getRam());
+
+                        // Save to InfluxDB
+                        metricService.save(metric);
+
+                        System.out.println("Metric saved successfully to InfluxDB");
+
+                    } catch (Exception e) {
+
+                        System.err.println("Failed to process MQTT metric");
+
+                        e.printStackTrace();
+                    }
                 })
                 .get();
     }

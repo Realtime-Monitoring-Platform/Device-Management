@@ -1,20 +1,18 @@
 package com.realtime_monitoring.device_management.config;
 
-import org.springframework.context.annotation.Configuration;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
-
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class InfluxDBConfig {
+
     @Value("${influxdb.url}")
     private String url;
+
     @Value("${influxdb.token}")
     private String token;
 
@@ -26,6 +24,12 @@ public class InfluxDBConfig {
 
     @Bean
     public InfluxDBClient influxDBClient() {
-        return InfluxDBClientFactory.create(url, token.toCharArray(), org, bucket);
+
+        return InfluxDBClientFactory.create(
+                url,
+                token.toCharArray(),
+                org,
+                bucket
+        );
     }
 }
