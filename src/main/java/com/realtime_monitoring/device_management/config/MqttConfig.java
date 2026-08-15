@@ -1,6 +1,7 @@
 package com.realtime_monitoring.device_management.config;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +15,16 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 
+import com.influxdb.client.InfluxDBClient;
+
 import javax.net.ssl.SSLContext;
 
 @Configuration
 @EnableIntegration
 public class MqttConfig {
+
+    @Autowired
+    private InfluxDBClient influxDBClient;
 
     @Value("${mqtt.broker}")
     private String broker;
@@ -43,7 +49,7 @@ public class MqttConfig {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
 
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setServerURIs(new String[]{broker});
+        options.setServerURIs(new String[] { broker });
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
         options.setKeepAliveInterval(30);
@@ -64,13 +70,13 @@ public class MqttConfig {
             @Qualifier("mqttInputChannel") MessageChannel mqttInputChannel,
             DefaultMqttPahoClientFactory mqttClientFactory) {
 
-        MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(clientId, mqttClientFactory, topic);
+        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(clientId,
+                mqttClientFactory, topic);
 
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(qos);
-        adapter.setOutputChannel(mqttInputChannel);   // required
+        adapter.setOutputChannel(mqttInputChannel); // required
 
         return adapter;
     }
