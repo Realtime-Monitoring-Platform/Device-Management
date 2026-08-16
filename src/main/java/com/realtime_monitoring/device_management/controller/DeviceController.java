@@ -9,6 +9,8 @@ import com.realtime_monitoring.device_management.dto.ExecuteCommand;
 import com.realtime_monitoring.device_management.dto.ProvisionRequest;
 import com.realtime_monitoring.device_management.dto.ProvisionResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
+import com.realtime_monitoring.device_management.entity.DeviceCommand;
+import com.realtime_monitoring.device_management.service.DeviceCommandeService;
 import com.realtime_monitoring.device_management.service.DeviceService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RequiredArgsConstructor
 public class DeviceController {
     private final DeviceService deviceService;
-
+    private final DeviceCommandeService deviceCommandeService;
     @PostMapping
     public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviecRequest request) {
 
@@ -76,9 +78,23 @@ public class DeviceController {
     }
 
     @PostMapping("/{deviceId}/commands")
-    public ResponseEntity<?> execute(@PathVariable UUID deviceId, @RequestBody ExecuteCommand command) {
+    public ResponseEntity<DeviceCommand> execute(@PathVariable UUID deviceId, @RequestBody ExecuteCommand command,HttpServletRequest request) {
 
-        return ResponseEntity.ok().build();
+       DeviceCommand deviceCommand = this.deviceCommandeService.createCommand(deviceId, UUID.fromString(request.getHeader("X-User-Tenant-Id")), UUID.fromString(request.getHeader("X-User-Id")), command.getCommand());
+        return ResponseEntity.ok(deviceCommand);
     }
+
+    // @GetMapping("/user/me")
+    // public ResponseEntity<List<Notification>> getNotificationsByUserHeader(HttpServletRequest request) {
+    //     System.out.println("X-User-Id: " + request.getHeader("X-User-Id"));
+    // System.out.println("X-User-Email: " + request.getHeader("X-User-Email"));
+    // System.out.println("X-User-Role: " + request.getHeader("X-User-Role"));
+    // System.out.println("X-User-Tenant-Id: " + request.getHeader("X-User-Tenant-Id"));
+    // System.out.println("X-User-Name: " + request.getHeader("X-User-Name"));
+    //              System.out.println("X-User-Id::::::::::::::: " + request.getHeader("X-User-Id"));
+    //     return ResponseEntity.ok(notificationRepository.findByUserIdOrderByCreatedAtDesc(request.getHeader("X-User-Id")));
+    // }
+  
+    
 
 }
