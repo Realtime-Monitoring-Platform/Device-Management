@@ -12,6 +12,7 @@ import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 
@@ -26,7 +27,6 @@ import javax.net.ssl.SSLContext;
 @EnableIntegration
 public class MqttConfig {
 
-   
     @Value("${mqtt.broker}")
     private String broker;
 
@@ -86,6 +86,19 @@ public class MqttConfig {
         adapter.setOutputChannel(mqttInputChannel); // required
 
         return adapter;
+    }
+
+    @Bean
+    public MqttPahoMessageHandler mqttOutbound(
+            DefaultMqttPahoClientFactory mqttClientFactory) {
+
+        MqttPahoMessageHandler handler = new MqttPahoMessageHandler(
+                clientId + "-publisher",
+                mqttClientFactory);
+        handler.setAsync(true);
+        handler.setDefaultQos(1);
+
+        return handler;
     }
 
     @Bean

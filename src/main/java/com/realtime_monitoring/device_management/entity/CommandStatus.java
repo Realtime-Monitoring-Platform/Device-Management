@@ -5,5 +5,6 @@ public enum CommandStatus {
     IN_PROGRESS,
     COMPLETED,
     FAILED,
-    CANCELLED
+    CANCELLED,
+    SENT
 }
