@@ -11,6 +11,7 @@ import com.realtime_monitoring.device_management.mqtt.MqttCommandPub;
 import com.realtime_monitoring.device_management.repository.DeviceCommandRepository;
 import com.realtime_monitoring.device_management.service.DeviceCommandeService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,17 +22,29 @@ public class DeviceCommandeServiceImp implements DeviceCommandeService {
     private final MqttCommandPub mqttPubLisher;
 
     @Override
+    @Transactional
     public DeviceCommand createCommand(UUID deviceId, UUID tenantId, UUID userId, String command) {
+
         DeviceCommand deviceCommand = new DeviceCommand();
+
         deviceCommand.setDeviceId(deviceId);
         deviceCommand.setTenantId(tenantId);
         deviceCommand.setUserId(userId);
         deviceCommand.setCommand(command);
         deviceCommand.setStatus(CommandStatus.PENDING);
+
         DeviceCommand saved = deviceCommandRepository.save(deviceCommand);
-        mqttPubLisher.sendCommand(tenantId, deviceId, userId, command);
-        saved.setStatus(CommandStatus.SENT);
+
+        try {
+            mqttPubLisher.sendCommand(tenantId, deviceId, saved.getId(), command);
+            saved.setStatus(CommandStatus.SENT);
+
+        } catch (Exception e) {
+            saved.setStatus(CommandStatus.FAILED);
+
+            System.err.println(e.getMessage());
+        }
+
         return deviceCommandRepository.save(saved);
     }
-
 }
