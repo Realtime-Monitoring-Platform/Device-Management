@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtime_monitoring.device_management.dto.CreateDeviecRequest;
 import com.realtime_monitoring.device_management.dto.DeviceResponse;
+import com.realtime_monitoring.device_management.dto.ExecuteCommand;
 import com.realtime_monitoring.device_management.dto.ProvisionRequest;
 import com.realtime_monitoring.device_management.dto.ProvisionResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
@@ -60,16 +61,24 @@ public class DeviceController {
 
         return ResponseEntity.ok(deviceService.updateDevice(id, request));
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDevice(@PathVariable UUID id) {
         deviceService.deleteDevice(id);
-        return ResponseEntity.noContent().build(); 
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/provision/{token}")
-    public ProvisionResponse provisionDevice(@PathVariable String token, @RequestBody ProvisionRequest provisionRequest) {
-        
+    public ProvisionResponse provisionDevice(@PathVariable String token,
+            @RequestBody ProvisionRequest provisionRequest) {
+
         return deviceService.provisionDevice(token, provisionRequest);
+    }
+
+    @PostMapping("/{deviceId}/commands")
+    public ResponseEntity<?> execute(@PathVariable UUID deviceId, @RequestBody ExecuteCommand command) {
+
+        return ResponseEntity.ok().build();
     }
 
 }
