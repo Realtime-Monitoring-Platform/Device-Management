@@ -27,11 +27,8 @@ public class CreateDeviecRequest {
     private UUID tenantId;
     private String model;
     private String manufacturer;
-    private String hostname;
-    private String ipAddress;
-    private String macAddress;
+    
 
-    private String location;
 
     private DeviceStatus status;
 

@@ -18,22 +18,12 @@ public class UpdateDeviceRequest {
     private UUID teamId;
     private String deviceName;
     private String serialNumber;
-    private String hostname;
+
     private String manufacturer;
     private String model;
 
-    private String macAddress;
-
-    private String ipAddress;
-
-    private String firmwareVersion;
-
-    private String agentVersion;
-
     private DeviceStatus status;
 
-
     private LocalDateTime lastSeen;
-
 
 }

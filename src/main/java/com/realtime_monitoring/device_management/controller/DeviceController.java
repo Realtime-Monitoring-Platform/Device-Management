@@ -46,17 +46,17 @@ public class DeviceController {
     private final DeviceService deviceService;
     private final DeviceCommandeService deviceCommandeService;
     private final DeviceLogSSEService deviceLogSseService;
+
     @PostMapping
     public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviecRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(deviceService.CreateDevice(request));
     }
 
-    @GetMapping(value="/{deviceId}/logs/stream",produces=MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/{deviceId}/logs/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamLogs(@PathVariable String deviceId) {
         return deviceLogSseService.subscribe(deviceId);
     }
-    
 
     @GetMapping("/{id}")
     public ResponseEntity<DeviceResponse> getDevice(@PathVariable UUID id) {
@@ -85,7 +85,6 @@ public class DeviceController {
     @PostMapping("/provision/{token}")
     public ProvisionResponse provisionDevice(@PathVariable String token,
             @RequestBody ProvisionRequest provisionRequest) {
-
         return deviceService.provisionDevice(token, provisionRequest);
     }
 

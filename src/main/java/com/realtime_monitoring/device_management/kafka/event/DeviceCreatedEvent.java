@@ -3,28 +3,30 @@ package com.realtime_monitoring.device_management.kafka.event;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 import com.realtime_monitoring.device_management.entity.DeviceStatus;
 
-
-
 public record DeviceCreatedEvent(
-        UUID id,
-        DomainEvent event,
-        UUID assignedUserId,
-        String deviceName,
-        String model,
-        String manufacturer,
-        String hostname,
-        String ipAddress,
-        String macAddress,
-        String location,
-        DeviceStatus status,
-        LocalDateTime lastSeen,
-        UUID tenantId,
-        UUID teamId
-       // String mqttHashPassword,
-        //String mqttPassword,
-        //String MqttUsername
+                UUID id,
+                DomainEvent event,
+                UUID assignedUserId,
+                String deviceName,
+                String model,
+                String manufacturer,
+                String hostname,
+                String ipAddress,
+                String macAddress,
+                String location,
+                DeviceStatus status,
+                LocalDateTime lastSeen,
+                UUID tenantId,
+                UUID teamId,
+                String osName,
+                String osVersion,
+                String kernelVersion,
+                Long cpuCount,
+                Long totalMemoryKb
+// String mqttHashPassword,
+// String mqttPassword,
+// String MqttUsername
 ) {
 }

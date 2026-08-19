@@ -46,7 +46,13 @@ public class DeviceProducer {
                                 device.getLastSeen(),
 
                                 device.getTenantId(),
-                                device.getTeamId()
+                                device.getTeamId(),
+                                device.getOsName(),
+                                device.getOsVersion(),
+                                device.getKernelVersion(),
+                                device.getCpuCount(),
+                                device.getTotalMemoryKb()
+                                
                          //       device.getMqttHashPassword(),
                            //     device.getMqttPassword(),
                              //   device.getMqttUsername()
@@ -79,7 +85,13 @@ public class DeviceProducer {
                                 device.getStatus(),
                                 device.getLastSeen(),
                                 device.getTenantId(),
-                                device.getTeamId()
+                                device.getTeamId(),
+                                device.getOsName(),
+                                device.getOsVersion(),
+                                device.getKernelVersion(),
+                                device.getCpuCount(),
+                                device.getTotalMemoryKb()
+
                         //        device.getMqttHashPassword(),
                           //      device.getMqttPassword(),
                             //    device.getMqttUsername()

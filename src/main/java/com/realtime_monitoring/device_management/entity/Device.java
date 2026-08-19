@@ -59,12 +59,15 @@ public class Device {
 
     @Enumerated(EnumType.STRING)
     private DeviceStatus status;
-
+     
+    private String osName;
+    private String osVersion;
+    private String kernelVersion;
+    private Long cpuCount;
+    private Long totalMemoryKb;
     private LocalDateTime lastSeen;
-    // private String MqttUsername;
-    // private String mqttPassword;
-    // private String mqttHashPassword;
-
+   
+    
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
