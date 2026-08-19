@@ -1,6 +1,13 @@
 server:
     port: 9005
 spring:
+    elasticsearch:
+        uris: https://431532ea674d4a389e91b862af44f658.us-central1.gcp.cloud.es.io:443
+        api-key: cnlWSUZhQUI4OFZaV2plVHZWeDA6QXNwLWtjeGM0cnRJREhUWUhDWnQ5UQ==
+        username: elastic
+        password: 09xLjtqkoSYBzrx7c3B1aJje
+        connection-timeout: 10s
+        socket-timeout: 60s
     cloud:
         config:
             enabled: false
@@ -16,6 +23,7 @@ spring:
             ddl-auto: update
         database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
+    
     kafka:
         bootstrap-servers: localhost:9092
         producer:
@@ -29,7 +37,7 @@ spring:
                     deviceDeleted:com.realtime_monitoring.device_management.kafka.event.DeviceDeletedEvent
         # kafka:
     #     bootstrap-servers: localhost:9092
-    #     producer:
+    #     producer:mqtt.command-results-topic=tenants/+/devices/+/command-results
     #         key-serializer: org.apache.kafka.common.serialization.StringSerializer
     #         value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
@@ -37,7 +45,9 @@ mqtt:
     broker: ssl://192.168.1.122:8883
     client-id: monitoring-backend
     topic: tenants/+/devices/+/metrics
-    qos: 1
+    logs-topic: tenants/+/devices/+/logs
+    command-results-topic: tenants/+/devices/+/command-results
+    qos: 1 
     ca-cert: C:/mqtt/backend/ca.crt
     client-cert: C:/mqtt/backend/backend.crt
     client-key: C:/mqtt/backend/backend.key
@@ -48,7 +58,8 @@ pki:
 #   client-cert: C:\mqtt\backend\backend.crt
 #   client-key: C:\mqtt\backend\backend.key
 influxdb:
-  url: http://localhost:8086
-  token: chedlychedly
+  url: https://us-east-1-1.aws.cloud2.influxdata.com
+  token: xsjJoBy7UA1MJKK0ZOQyQcxzoQ6N1mv72JVXnStqlXy8sKNDf4VH9MB-3PE2X5LMCsVQ64rPSJZYiC4ovyk-aw==
   org: docs
   bucket: chedly
+

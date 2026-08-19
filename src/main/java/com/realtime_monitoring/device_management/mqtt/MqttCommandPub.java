@@ -30,11 +30,11 @@ public class MqttCommandPub {
         message.setCommandId(commandId);
         message.setDeviceId(deviceId);
         message.setCommand(command);
-
+        System.out.println("Publishing command to topic: " + topic + ", commandId: " + commandId + ", deviceId: " + deviceId + ", command: " + command);
         try {
 
             String payload = objectMapper.writeValueAsString(message);
-
+            System.out.println("Payload::::::::::::: " + payload);
             mqttPahoMessageHandler.handleMessage(MessageBuilder.withPayload(payload).setHeader(MqttHeaders.TOPIC, topic)
                     .setHeader(MqttHeaders.QOS, 1)
                     .build());

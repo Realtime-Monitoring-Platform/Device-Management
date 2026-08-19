@@ -1,9 +1,11 @@
 package com.realtime_monitoring.device_management.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtime_monitoring.device_management.dto.CreateDeviecRequest;
+import com.realtime_monitoring.device_management.dto.DeviceLog;
 import com.realtime_monitoring.device_management.dto.DeviceResponse;
 import com.realtime_monitoring.device_management.dto.ExecuteCommand;
 import com.realtime_monitoring.device_management.dto.ProvisionRequest;
@@ -11,6 +13,7 @@ import com.realtime_monitoring.device_management.dto.ProvisionResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 import com.realtime_monitoring.device_management.entity.DeviceCommand;
 import com.realtime_monitoring.device_management.service.DeviceCommandeService;
+import com.realtime_monitoring.device_management.service.DeviceLogService;
 import com.realtime_monitoring.device_management.service.DeviceService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public class DeviceController {
     private final DeviceService deviceService;
     private final DeviceCommandeService deviceCommandeService;
+
     @PostMapping
     public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviecRequest request) {
 
@@ -57,8 +61,7 @@ public class DeviceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DeviceResponse> updateDevice(
-            @PathVariable UUID id,
+    public ResponseEntity<DeviceResponse> updateDevice(@PathVariable UUID id,
             @Valid @RequestBody UpdateDeviceRequest request) {
 
         return ResponseEntity.ok(deviceService.updateDevice(id, request));
@@ -78,23 +81,56 @@ public class DeviceController {
     }
 
     @PostMapping("/{deviceId}/commands")
-    public ResponseEntity<DeviceCommand> execute(@PathVariable UUID deviceId, @RequestBody ExecuteCommand command,HttpServletRequest request) {
+    public ResponseEntity<DeviceCommand> execute(@PathVariable UUID deviceId, @RequestBody ExecuteCommand command,
+            HttpServletRequest request) {
 
-       DeviceCommand deviceCommand = this.deviceCommandeService.createCommand(deviceId, UUID.fromString(request.getHeader("X-User-Tenant-Id")), UUID.fromString(request.getHeader("X-User-Id")), command.getCommand());
+        DeviceCommand deviceCommand = this.deviceCommandeService.createCommand(deviceId,
+                UUID.fromString(request.getHeader("X-User-Tenant-Id")), UUID.fromString(request.getHeader("X-User-Id")),
+                command.getCommand());
         return ResponseEntity.ok(deviceCommand);
     }
 
+    @GetMapping("/commands/{commandId}")
+    public ResponseEntity<DeviceCommand> getCommand(@PathVariable UUID commandId) {
+        return ResponseEntity.ok(deviceCommandeService.getCommandById(commandId));
+    }
+
+    private final DeviceLogService deviceLogService;
+
+    @GetMapping("/{deviceId}/logs")
+    public ResponseEntity<Page<DeviceLog>> getLogsByDevice(@PathVariable String deviceId,
+            @RequestParam(required = false) String level,
+            @PageableDefault(page = 0, size = 50) Pageable pageable) {
+
+        if (level != null && !level.isBlank()) {
+            return ResponseEntity.ok(
+                    deviceLogService.getLogsByDeviceAndLevel(deviceId, level.toUpperCase(), pageable));
+        }
+
+        return ResponseEntity.ok(deviceLogService.getLogsByDevice(deviceId, pageable));
+    }
+
+    @GetMapping("/tenants/{tenantId}/logs")
+    public ResponseEntity<Page<DeviceLog>> getLogsByTenant(
+            @PathVariable String tenantId,
+            @PageableDefault(page = 0, size = 50) Pageable pageable) {
+
+        return ResponseEntity.ok(deviceLogService.getLogsByTenant(tenantId, pageable));
+    }
+
     // @GetMapping("/user/me")
-    // public ResponseEntity<List<Notification>> getNotificationsByUserHeader(HttpServletRequest request) {
-    //     System.out.println("X-User-Id: " + request.getHeader("X-User-Id"));
+    // public ResponseEntity<List<Notification>>
+    // getNotificationsByUserHeader(HttpServletRequest request) {
+    // System.out.println("X-User-Id: " + request.getHeader("X-User-Id"));
     // System.out.println("X-User-Email: " + request.getHeader("X-User-Email"));
     // System.out.println("X-User-Role: " + request.getHeader("X-User-Role"));
-    // System.out.println("X-User-Tenant-Id: " + request.getHeader("X-User-Tenant-Id"));
+    // System.out.println("X-User-Tenant-Id: " +
+    // request.getHeader("X-User-Tenant-Id"));
     // System.out.println("X-User-Name: " + request.getHeader("X-User-Name"));
-    //              System.out.println("X-User-Id::::::::::::::: " + request.getHeader("X-User-Id"));
-    //     return ResponseEntity.ok(notificationRepository.findByUserIdOrderByCreatedAtDesc(request.getHeader("X-User-Id")));
+    // System.out.println("X-User-Id::::::::::::::: " +
+    // request.getHeader("X-User-Id"));
+    // return
+    // ResponseEntity.ok(notificationRepository.findByUserIdOrderByCreatedAtDesc(request.getHeader("X-User-Id")));
     // }
-  
-    
 
 }

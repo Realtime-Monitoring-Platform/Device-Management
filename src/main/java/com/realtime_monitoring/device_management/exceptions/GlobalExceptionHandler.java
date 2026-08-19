@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
         ErrorResponse deviceNotFound = new ErrorResponse(LocalDateTime.now(), exception.getMessage(), "Device Not Found");
         return new ResponseEntity<>(deviceNotFound, HttpStatus.NOT_FOUND);
     }
+    
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {

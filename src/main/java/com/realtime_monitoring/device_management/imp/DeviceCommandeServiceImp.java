@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.eclipse.paho.client.mqttv3.internal.wire.MqttPublish;
 import org.springframework.stereotype.Service;
 
+import com.realtime_monitoring.device_management.dto.CommandResult;
 import com.realtime_monitoring.device_management.entity.CommandStatus;
 import com.realtime_monitoring.device_management.entity.DeviceCommand;
 import com.realtime_monitoring.device_management.mqtt.MqttCommandPub;
@@ -46,5 +47,36 @@ public class DeviceCommandeServiceImp implements DeviceCommandeService {
         }
 
         return deviceCommandRepository.save(saved);
+    }
+
+    @Override
+    @Transactional
+    public void handleCommandResult(CommandResult result) {
+        System.out.println("Handling command result for commandId: " + result.getCommandId());
+        System.out.println("Status: " + result.getStatus());
+        System.out.println("Stdout: " + result.getStdout());
+        UUID commandId = UUID.fromString(result.getCommandId());
+
+        DeviceCommand deviceCommand = deviceCommandRepository.findById(commandId)
+                .orElseThrow(() -> new RuntimeException(
+                        "DeviceCommand not found: " + commandId));
+
+        deviceCommand.setStatus(
+                "SUCCESS".equals(result.getStatus())
+                        ? CommandStatus.COMPLETED // adjust to whatever enum values you have
+                        : CommandStatus.FAILED);
+
+        deviceCommand.setStdout(result.getStdout()); // add this field to the entity if missing
+        deviceCommand.setExitCode(result.getExitCode()); // add this field too
+
+        DeviceCommand saved = deviceCommandRepository.save(deviceCommand);
+    }
+
+   
+    @Override
+    @Transactional
+    public DeviceCommand getCommandById(UUID commandId) {
+        return deviceCommandRepository.findById(commandId)
+                .orElseThrow(() -> new RuntimeException("Command not found: " + commandId));
     }
 }

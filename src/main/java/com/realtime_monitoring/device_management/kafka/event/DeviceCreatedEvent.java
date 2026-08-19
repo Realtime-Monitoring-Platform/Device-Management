@@ -22,9 +22,9 @@ public record DeviceCreatedEvent(
         DeviceStatus status,
         LocalDateTime lastSeen,
         UUID tenantId,
-        UUID teamId,
-        String mqttHashPassword,
-        String mqttPassword,
-        String MqttUsername
+        UUID teamId
+       // String mqttHashPassword,
+        //String mqttPassword,
+        //String MqttUsername
 ) {
 }

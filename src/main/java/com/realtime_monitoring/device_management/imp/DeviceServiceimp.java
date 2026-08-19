@@ -47,12 +47,12 @@ public class DeviceServiceimp implements DeviceService {
         String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         String generatedIdentifier = UUID.randomUUID().toString();
         device.setDeviceIdentifier(generatedIdentifier);
-        device.setMqttPassword(generatedPassword);
-        device.setMqttUsername(GeneratedId);
+     //   device.setMqttPassword(generatedPassword);
+       // device.setMqttUsername(GeneratedId);
         System.out.println("Generated Password: " + generatedPassword);
         String hashedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(generatedPassword,
                 org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
-        device.setMqttHashPassword(hashedPassword);
+       // device.setMqttHashPassword(hashedPassword);
 
         Device savedDevice = deviceRepository.save(device);
         DeviceToken deviceToken = new DeviceToken();

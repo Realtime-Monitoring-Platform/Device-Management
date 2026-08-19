@@ -1,6 +1,7 @@
 package com.realtime_monitoring.device_management.kafka;
 
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.realtime_monitoring.device_management.entity.Device;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Component
 public class DeviceProducer {
         private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -44,10 +46,10 @@ public class DeviceProducer {
                                 device.getLastSeen(),
 
                                 device.getTenantId(),
-                                device.getTeamId(),
-                                device.getMqttHashPassword(),
-                                device.getMqttPassword(),
-                                device.getMqttUsername()
+                                device.getTeamId()
+                         //       device.getMqttHashPassword(),
+                           //     device.getMqttPassword(),
+                             //   device.getMqttUsername()
 
                 );
 
@@ -77,10 +79,10 @@ public class DeviceProducer {
                                 device.getStatus(),
                                 device.getLastSeen(),
                                 device.getTenantId(),
-                                device.getTeamId(),
-                                device.getMqttHashPassword(),
-                                device.getMqttPassword(),
-                                device.getMqttUsername()
+                                device.getTeamId()
+                        //        device.getMqttHashPassword(),
+                          //      device.getMqttPassword(),
+                            //    device.getMqttUsername()
                         );
 
                 log.info("sending device update event: {}", deviceEvent);
