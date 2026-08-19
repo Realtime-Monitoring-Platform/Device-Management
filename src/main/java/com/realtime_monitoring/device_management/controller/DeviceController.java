@@ -3,9 +3,11 @@ package com.realtime_monitoring.device_management.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.realtime_monitoring.device_management.dto.CreateDeviecRequest;
 import com.realtime_monitoring.device_management.dto.DeviceLog;
+import com.realtime_monitoring.device_management.dto.DeviceLogSSEService;
 import com.realtime_monitoring.device_management.dto.DeviceResponse;
 import com.realtime_monitoring.device_management.dto.ExecuteCommand;
 import com.realtime_monitoring.device_management.dto.ProvisionRequest;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,12 +45,18 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public class DeviceController {
     private final DeviceService deviceService;
     private final DeviceCommandeService deviceCommandeService;
-
+    private final DeviceLogSSEService deviceLogSseService;
     @PostMapping
     public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviecRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(deviceService.CreateDevice(request));
     }
+
+    @GetMapping(value="/{deviceId}/logs/stream",produces=MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamLogs(@PathVariable String deviceId) {
+        return deviceLogSseService.subscribe(deviceId);
+    }
+    
 
     @GetMapping("/{id}")
     public ResponseEntity<DeviceResponse> getDevice(@PathVariable UUID id) {

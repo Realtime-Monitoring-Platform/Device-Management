@@ -1,5 +1,6 @@
 package com.realtime_monitoring.device_management.config;
 
+import com.realtime_monitoring.device_management.dto.DeviceLogSSEService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,8 @@ import com.realtime_monitoring.device_management.service.MetricsService;
 @EnableIntegration
 public class MqttConfig {
 
+    private final DeviceLogSSEService deviceLogSSEService;
+
     @Value("${mqtt.client-id}")
     private String clientId;
 
@@ -50,11 +53,12 @@ public class MqttConfig {
     public MqttConfig(ObjectMapper objectMapper,
             MetricsService metricService,
             DeviceCommandeService deviceCommandeService,
-            DeviceLogService deviceLogService) {
+            DeviceLogService deviceLogService, DeviceLogSSEService deviceLogSSEService) {
         this.objectMapper = objectMapper;
         this.metricService = metricService;
         this.deviceCommandeService = deviceCommandeService;
         this.deviceLogService = deviceLogService;
+        this.deviceLogSSEService = deviceLogSSEService;
     }
 
     @Bean
@@ -101,18 +105,18 @@ public class MqttConfig {
                         String receivedTopic = message.getHeaders()
                                 .get("mqtt_receivedTopic", String.class);
 
-                        System.out.println("========================================");
-                        System.out.println("MQTT MESSAGE RECEIVED");
-                        System.out.println("Topic: " + receivedTopic);
-                        System.out.println("Payload: " + payload);
-                        System.out.println("========================================");
+                        // System.out.println("========================================");
+                        // System.out.println("MQTT MESSAGE RECEIVED");
+                        // System.out.println("Topic: " + receivedTopic);
+                        // System.out.println("Payload: " + payload);
+                        // System.out.println("========================================");
 
                         DevicemEtrics metric = objectMapper.readValue(payload, DevicemEtrics.class);
 
-                        System.out.println("Device ID: " + metric.getDevice_id());
-                        System.out.println("Tenant ID: " + metric.getTenant_id());
-                        System.out.println("CPU: " + metric.getCpu());
-                        System.out.println("RAM: " + metric.getRam());
+                        // System.out.println("Device ID: " + metric.getDevice_id());
+                        // System.out.println("Tenant ID: " + metric.getTenant_id());
+                        // System.out.println("CPU: " + metric.getCpu());
+                        // System.out.println("RAM: " + metric.getRam());
 
                         metricService.save(metric);
 
@@ -140,11 +144,11 @@ public class MqttConfig {
                         String receivedTopic = message.getHeaders()
                                 .get("mqtt_receivedTopic", String.class);
 
-                        System.out.println("========================================");
-                        System.out.println("MQTT LOGS RECEIVED");
-                        System.out.println("Topic: " + receivedTopic);
-                        System.out.println("Payload: " + payload);
-                        System.out.println("========================================");
+                        // System.out.println("========================================");
+                        // System.out.println("MQTT LOGS RECEIVED");
+                        // System.out.println("Topic: " + receivedTopic);
+                        // System.out.println("Payload: " + payload);
+                        // System.out.println("========================================");
 
                         DeviceLogsMessage logsMessage = objectMapper.readValue(
                                 payload,
@@ -157,16 +161,18 @@ public class MqttConfig {
 
                         for (DeviceLogMessage logMessage : logsMessage.getLogs()) {
 
-                            System.out.println("----------------------------------------");
-                            System.out.println("Device ID: " + logMessage.getDeviceId());
-                            System.out.println("Tenant ID: " + logMessage.getTenantId());
-                            System.out.println("Level: " + logMessage.getLevel());
-                            System.out.println("Service: " + logMessage.getService());
-                            System.out.println("Source: " + logMessage.getSource());
-                            System.out.println("Message: " + logMessage.getMessage());
-                            System.out.println("Timestamp: " + logMessage.getTimestamp());
+                            // System.out.println("----------------------------------------");
+                            // System.out.println("Device ID: " + logMessage.getDeviceId());
+                            // System.out.println("Tenant ID: " + logMessage.getTenantId());
+                            // System.out.println("Level: " + logMessage.getLevel());
+                            // System.out.println("Service: " + logMessage.getService());
+                            // System.out.println("Source: " + logMessage.getSource());
+                            // System.out.println("Message: " + logMessage.getMessage());
+                            // System.out.println("Timestamp: " + logMessage.getTimestamp());
 
                             deviceLogService.saveLog(logMessage);
+                            deviceLogSSEService.publish(logMessage.getDeviceId(),
+                                    logMessage);
                         }
 
                         System.out.println("All device logs saved successfully.");
@@ -225,11 +231,11 @@ public class MqttConfig {
                         String receivedTopic = message.getHeaders()
                                 .get("mqtt_receivedTopic", String.class);
 
-                        System.out.println("========================================");
-                        System.out.println("MQTT COMMAND RESULT RECEIVED");
-                        System.out.println("Topic: " + receivedTopic);
-                        System.out.println("Payload: " + payload);
-                        System.out.println("========================================");
+                        // System.out.println("========================================");
+                        // System.out.println("MQTT COMMAND RESULT RECEIVED");
+                        // System.out.println("Topic: " + receivedTopic);
+                        // System.out.println("Payload: " + payload);
+                        // System.out.println("========================================");
 
                         CommandResult result = objectMapper.readValue(payload, CommandResult.class);
 

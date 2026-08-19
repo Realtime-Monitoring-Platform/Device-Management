@@ -30,13 +30,13 @@ public class DeviceLogServiceImp implements DeviceLogService {
         doc.setReceivedAt(Instant.now());
         
         DeviceLog savedLog = deviceLogRepository.save(doc);
-        System.out.println("========================================");
-        System.out.println("DEVICE LOG SAVED");
-        System.out.println("Device ID: " + savedLog.getDeviceId());
-        System.out.println("Tenant ID: " + savedLog.getTenantId());
-        System.out.println("Level: " + savedLog.getLevel());
-        System.out.println("Message: " + savedLog.getMessage());
-        System.out.println("========================================");
+        // System.out.println("========================================");
+        // System.out.println("DEVICE LOG SAVED");
+        // System.out.println("Device ID: " + savedLog.getDeviceId());
+        // System.out.println("Tenant ID: " + savedLog.getTenantId());
+        // System.out.println("Level: " + savedLog.getLevel());
+        // System.out.println("Message: " + savedLog.getMessage());
+        // System.out.println("========================================");
 
     }
 

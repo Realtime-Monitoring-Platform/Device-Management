@@ -57,9 +57,14 @@ pki:
 #   ca-cert: C:\mqtt\backend\ca.crt
 #   client-cert: C:\mqtt\backend\backend.crt
 #   client-key: C:\mqtt\backend\backend.key
+# influxdb:
+#   url: https://us-east-1-1.aws.cloud2.influxdata.com
+#   token: xsjJoBy7UA1MJKK0ZOQyQcxzoQ6N1mv72JVXnStqlXy8sKNDf4VH9MB-3PE2X5LMCsVQ64rPSJZYiC4ovyk-aw==
+#   org: docs
+#   bucket: chedly
 influxdb:
-  url: https://us-east-1-1.aws.cloud2.influxdata.com
-  token: xsjJoBy7UA1MJKK0ZOQyQcxzoQ6N1mv72JVXnStqlXy8sKNDf4VH9MB-3PE2X5LMCsVQ64rPSJZYiC4ovyk-aw==
+  url: http://localhost:8086
+  token: UzzK1e06v7oMVkXeTTbAlKjv0l6Kh7e7sGaWNWp3IkJUTE8RfTkhbYaUJ4tBNSdCAc74GgZHU02QCwDLHAxBBQ==
   org: docs
   bucket: chedly
 
