@@ -25,13 +25,16 @@ public class MqttClientFactoryConfig {
     public DefaultMqttPahoClientFactory mqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
 
+
         MqttConnectOptions options = new MqttConnectOptions();
         options.setServerURIs(new String[] { broker });
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
         options.setKeepAliveInterval(30);
         options.setConnectionTimeout(10);
-        options.setSocketFactory(sslContext.getSocketFactory());
+        if (broker != null && broker.toLowerCase().startsWith("ssl://")) {
+            options.setSocketFactory(sslContext.getSocketFactory());
+        }
 
         factory.setConnectionOptions(options);
         return factory;

@@ -1,5 +1,7 @@
 package com.realtime_monitoring.device_management.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,17 +24,29 @@ import java.util.Base64;
 @Configuration
 public class MqttSslConfig {
 
-    @Value("${mqtt.ca-cert}")
+    private static final Logger log = LoggerFactory.getLogger(MqttSslConfig.class);
+
+    
+    @Value("${mqtt.ssl-enabled:false}")
+    private boolean sslEnabled;
+
+    @Value("${mqtt.ca-cert:C:/mqtt/backend/ca.crt}")
     private String caCertPath;
 
-    @Value("${mqtt.client-cert}")
+    @Value("${mqtt.client-cert:C:/mqtt/backend/backend.crt}")
     private String clientCertPath;
 
-    @Value("${mqtt.client-key}")
+    @Value("${mqtt.client-key:C:/mqtt/backend/backend.key}")
     private String clientKeyPath;
 
     @Bean
     public SSLContext mqttSslContext() throws Exception {
+
+        // Local dev without broker certs: use the JVM default SSLContext.
+        if (!sslEnabled) {
+            log.warn("MQTT TLS is DISABLED (mqtt.ssl-enabled=false). Using default SSLContext.");
+            return SSLContext.getDefault();
+        }
 
         // ==========================================
         // CA CERTIFICATE
