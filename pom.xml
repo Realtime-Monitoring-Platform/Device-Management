@@ -22,7 +22,8 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <!-- Security overrides (Trivy) -->
-        <bouncycastle.version>1.85.2</bouncycastle.version>
+        <!-- bcprov has 1.85.2; bcpkix only goes up to 1.85 — use 1.85 for both -->
+        <bouncycastle.version>1.85</bouncycastle.version>
         <postgresql.version>42.7.13</postgresql.version>
         <spring-kafka.version>3.3.16</spring-kafka.version>
     </properties>
