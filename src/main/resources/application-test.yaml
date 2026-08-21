@@ -1,0 +1,43 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+
+  # In-memory database so the JPA layer works without a real PostgreSQL instance.
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+
+  kafka:
+    # Kafka is never contacted during tests; the producer factory connects lazily.
+    bootstrap-servers: localhost:9092
+
+eureka:
+  client:
+    enabled: false
+
+mqtt:
+  # Local non-TLS broker (nothing listens on 1883 during tests -> fast connection refused).
+  broker: tcp://localhost:1883
+  client-id: test-client
+  topic: devices/+/metrics
+  command-results-topic: tenants/+/devices/+/command-results
+  logs-topic: tenants/+/devices/+/logs
+  qos: 1
+  ssl-enabled: false
+
+influxdb:
+  # InfluxDBClientFactory.create() is lazy and never connects during context load.
+  url: http://localhost:8086
+  token: test-token
+  org: test-org
+  bucket: test-bucket

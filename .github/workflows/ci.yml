@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    name: Build & Test (mvn clean package)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Cache Maven distribution & dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2
+            .mvn/wrapper
+          key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml', '.mvn/wrapper/maven-wrapper.properties') }}
+
+      - name: Run mvn clean package
+        run: ./mvnw -B clean package
+
+      - name: Upload test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+          retention-days: 7
