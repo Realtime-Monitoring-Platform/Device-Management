@@ -23,13 +23,11 @@ public class CreateDeviecRequest {
 
     private UUID teamId;
     private UUID assignedUserId;
-    private String firmwareVersion;
+    // private String firmwareVersion;
     private UUID tenantId;
-    private String model;
-    private String manufacturer;
+    // private String model;
+    // private String manufacturer;
     
-
-
     private DeviceStatus status;
 
 }
