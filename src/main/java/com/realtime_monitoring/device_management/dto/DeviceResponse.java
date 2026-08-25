@@ -35,21 +35,22 @@ public class DeviceResponse {
     @Column(nullable = false)
     private String deviceName;
 
-    private String model;
+    // private String model;
 
-    private String manufacturer;
+    // private String manufacturer;
 
-    @Column(nullable = false)
-    private String hostname;
+  
+  //  private String hostname;
 
-    private String ipAddress;
-    private String macAddress;
-    private String location;
+    // private String ipAddress;
+    // private String macAddress;
+    // private String location;
 
     @Enumerated(EnumType.STRING)
     private DeviceStatus status;
 
     private LocalDateTime lastSeen;
+    private String deviceToken;
 
     @CreationTimestamp
     @Column(updatable = false)

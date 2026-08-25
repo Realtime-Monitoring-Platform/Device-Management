@@ -49,7 +49,6 @@ public class DeviceController {
 
     @PostMapping
     public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviecRequest request) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(deviceService.CreateDevice(request));
     }
 
