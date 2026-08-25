@@ -31,7 +31,6 @@ public class Device {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    
     private UUID tenantId;
 
     private UUID teamId;
@@ -41,9 +40,7 @@ public class Device {
     
     private String deviceName;
 
-    private String model;
-
-    private String manufacturer;
+    private String Description;
 
     
     private String hostname;
@@ -58,7 +55,7 @@ public class Device {
     private String location;
 
     @Enumerated(EnumType.STRING)
-    private DeviceStatus status=DeviceStatus.OFFLINE;
+    private DeviceStatus status;
      
     private String osName;
     private String osVersion;

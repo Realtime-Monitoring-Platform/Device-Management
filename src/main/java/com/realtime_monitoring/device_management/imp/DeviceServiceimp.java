@@ -44,7 +44,8 @@ public class DeviceServiceimp implements DeviceService {
         @Override
         public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
                 Device device = deviceMapper.toEntity(createDeviceRequest);
-                String generatedPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+                String generatedPassword = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
+                
                 String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
                 String generatedIdentifier = UUID.randomUUID().toString();
                 device.setDeviceIdentifier(generatedIdentifier);
