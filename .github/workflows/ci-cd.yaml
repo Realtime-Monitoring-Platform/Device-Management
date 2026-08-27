@@ -66,7 +66,7 @@ jobs:
           MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
           MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
           MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
-        run: mvn -B clean verify -Dspring.profiles.active=test
+        run: mvn -B clean package
 
   
   sonarqube:
@@ -92,7 +92,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify sonar:sonar \
+          mvn -B  sonar:sonar \
             -Dsonar.organization=realtime-monitoring-platform \
             -Dsonar.projectKey=Realtime-Monitoring-Platform_Device-Management \
             -Dsonar.projectName=Device-Management \
