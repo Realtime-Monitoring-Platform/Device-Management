@@ -6,12 +6,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@TestPropertySource(properties = {
+    "mqtt.broker=ssl://192.168.1.122:8883",
+    "mqtt.client-id=test-client",
+    "mqtt.topic=devices/+/metrics",
+    "mqtt.qos=1"
+})
 class MqttConfigTest {
 
     @Autowired

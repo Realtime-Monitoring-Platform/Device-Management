@@ -10,7 +10,8 @@ public record DeviceUpdatedEvent(
                 DomainEvent event,
                 UUID assignedUserId,
                 String deviceName,
-                
+                String model,
+                String manufacturer,
                 String hostname,
                 String ipAddress,
                 String macAddress,

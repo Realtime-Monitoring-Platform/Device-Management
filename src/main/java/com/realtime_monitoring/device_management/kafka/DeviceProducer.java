@@ -36,7 +36,8 @@ public class DeviceProducer {
                                 event,
                                 device.getAssignedUserId(),
                                 device.getDeviceName(),
-                                
+                                device.getModel(),
+                                device.getManufacturer(),
                                 device.getHostname(),
                                 device.getIpAddress(),
                                 device.getMacAddress(),
@@ -75,7 +76,8 @@ public class DeviceProducer {
                                 event,
                                 device.getAssignedUserId(),
                                 device.getDeviceName(),
-                               
+                                device.getModel(),
+                                device.getManufacturer(),
                                 device.getHostname(),
                                 device.getIpAddress(),
                                 device.getMacAddress(),

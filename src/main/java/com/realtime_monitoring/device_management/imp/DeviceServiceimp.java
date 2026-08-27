@@ -44,17 +44,16 @@ public class DeviceServiceimp implements DeviceService {
         @Override
         public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
                 Device device = deviceMapper.toEntity(createDeviceRequest);
-                String generatedPassword = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
-                
-                // String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+                String generatedPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+                String GeneratedId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
                 String generatedIdentifier = UUID.randomUUID().toString();
                 device.setDeviceIdentifier(generatedIdentifier);
                 // device.setMqttPassword(generatedPassword);
                 // device.setMqttUsername(GeneratedId);
                 System.out.println("Generated Password: " + generatedPassword);
-                // String hashedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(generatedPassword,
-                //                 org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
-                // // device.setMqttHashPassword(hashedPassword);
+                String hashedPassword = org.springframework.security.crypto.bcrypt.BCrypt.hashpw(generatedPassword,
+                                org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
+                // device.setMqttHashPassword(hashedPassword);
 
                 Device savedDevice = deviceRepository.save(device);
                 DeviceToken deviceToken = new DeviceToken();
@@ -63,11 +62,9 @@ public class DeviceServiceimp implements DeviceService {
                 deviceToken.setDevice(savedDevice);
                 deviceToken.setToken(Generatedtoken);
                 this.deviceTokenRepo.save(deviceToken);
-                
+
                 deviceProducer.sendDeviceCreation(savedDevice);
-                DeviceResponse deviceResponse = deviceMapper.toResponse(savedDevice);
-                deviceResponse.setDeviceToken(Generatedtoken);
-                return deviceResponse;
+                return deviceMapper.toResponse(savedDevice);
         }
 
         @Override

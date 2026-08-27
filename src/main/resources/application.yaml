@@ -1,78 +1,72 @@
-
-spring:
-  application:
-    name: device-service
-  config:
-    import: "optional:configserver:http://localhost:9000"
 server:
-  port: 8222
-
-
-
-# server:
-#     port: 9005
-# spring:
-#     elasticsearch:
-#         uris: https://431532ea674d4a389e91b862af44f658.us-central1.gcp.cloud.es.io:443
-#         api-key: cnlWSUZhQUI4OFZaV2plVHZWeDA6QXNwLWtjeGM0cnRJREhUWUhDWnQ5UQ==
-#         username: elastic
-#         password: 09xLjtqkoSYBzrx7c3B1aJje
-#         connection-timeout: 10s
-#         socket-timeout: 60s
-#     cloud:
-#         config:
-#             enabled: false
-#     application:
-#         name: device-service
-#     datasource:
-#         driver-class-name: org.postgresql.Driver
-#         url: jdbc:postgresql://localhost:5432/device_management
-#         username: postgres
-#         password: chedly
-#     jpa:
-#         hibernate:
-#             ddl-auto: update
-#         database: postgresql
-#         database-platform: org.hibernate.dialect.PostgreSQLDialect
+    port: 9005
+spring:
+    elasticsearch:
+        uris: https://431532ea674d4a389e91b862af44f658.us-central1.gcp.cloud.es.io:443
+        api-key: cnlWSUZhQUI4OFZaV2plVHZWeDA6QXNwLWtjeGM0cnRJREhUWUhDWnQ5UQ==
+        username: elastic
+        password: 09xLjtqkoSYBzrx7c3B1aJje
+        connection-timeout: 10s
+        socket-timeout: 60s
+    cloud:
+        config:
+            enabled: false
+    application:
+        name: device-service
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://localhost:5432/device_management
+        username: postgres
+        password: chedly
+    jpa:
+        hibernate:
+            ddl-auto: update
+        database: postgresql
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
     
-#     kafka:
-#         bootstrap-servers: localhost:9092
-#         producer:
-#             key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#             properties:
-#                 spring.json.add.type.info: false
-#                 spring.json.type.mapping: >
-#                     deviceCreated:com.realtime_monitoring.device_management.kafka.event.DeviceCreatedEvent,
-#                     deviceUpdated:com.realtime_monitoring.device_management.kafka.event.DeviceUpdatedEvent,
-#                     deviceDeleted:com.realtime_monitoring.device_management.kafka.event.DeviceDeletedEvent
-#         # kafka:
-#     #     bootstrap-servers: localhost:9092
-#     #     producer:mqtt.command-results-topic=tenants/+/devices/+/command-results
-#     #         key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#     #         value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    kafka:
+        bootstrap-servers: localhost:9092
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+                spring.json.add.type.info: false
+                spring.json.type.mapping: >
+                    deviceCreated:com.realtime_monitoring.device_management.kafka.event.DeviceCreatedEvent,
+                    deviceUpdated:com.realtime_monitoring.device_management.kafka.event.DeviceUpdatedEvent,
+                    deviceDeleted:com.realtime_monitoring.device_management.kafka.event.DeviceDeletedEvent
+        # kafka:
+    #     bootstrap-servers: localhost:9092
+    #     producer:mqtt.command-results-topic=tenants/+/devices/+/command-results
+    #         key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    #         value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-# mqtt:
-#     broker: ssl://192.168.1.122:8883
-#     client-id: monitoring-backend
-#     topic: tenants/+/devices/+/metrics
-#     logs-topic: tenants/+/devices/+/logs
-#     command-results-topic: tenants/+/devices/+/command-results
-#     qos: 1 
-#     ca-cert: C:/mqtt/backend/ca.crt
-#     client-cert: C:/mqtt/backend/backend.crt
-#     client-key: C:/mqtt/backend/backend.key
-# pki:
-#   ca-cert: C:/mqtt/backend/ca/ca.crt
-#   ca-key: C:/mqtt/backend/ca/ca.key
-# #   ca-cert: C:\mqtt\backend\ca.crt
-# #   client-cert: C:\mqtt\backend\backend.crt
-# #   client-key: C:\mqtt\backend\backend.key
-# # influxdb:
-# #   url: https://us-east-1-1.aws.cloud2.influxdata.com
-# #   token: xsjJoBy7UA1MJKK0ZOQyQcxzoQ6N1mv72JVXnStqlXy8sKNDf4VH9MB-3PE2X5LMCsVQ64rPSJZYiC4ovyk-aw==
-# #   org: docs
-# #   bucket: chedly
+mqtt:
+    broker: ssl://192.168.1.122:8883
+    client-id: monitoring-backend
+    topic: tenants/+/devices/+/metrics
+    logs-topic: tenants/+/devices/+/logs
+    command-results-topic: tenants/+/devices/+/command-results
+    qos: 1 
+    ca-cert: C:/mqtt/backend/ca.crt
+    client-cert: C:/mqtt/backend/backend.crt
+    client-key: C:/mqtt/backend/backend.key
+pki:
+  ca-cert: C:/mqtt/backend/ca/ca.crt
+  ca-key: C:/mqtt/backend/ca/ca.key
+#   ca-cert: C:\mqtt\backend\ca.crt
+#   client-cert: C:\mqtt\backend\backend.crt
+#   client-key: C:\mqtt\backend\backend.key
+# influxdb:
+#   url: https://us-east-1-1.aws.cloud2.influxdata.com
+#   token: xsjJoBy7UA1MJKK0ZOQyQcxzoQ6N1mv72JVXnStqlXy8sKNDf4VH9MB-3PE2X5LMCsVQ64rPSJZYiC4ovyk-aw==
+#   org: docs
+#   bucket: chedly
+influxdb:
+   url: https://us-east-1-1.aws.cloud2.influxdata.com
+   token: xsjJoBy7UA1MJKK0ZOQyQcxzoQ6N1mv72JVXnStqlXy8sKNDf4VH9MB-3PE2X5LMCsVQ64rPSJZYiC4ovyk-aw==
+   org: docs
+   bucket: chedly
 # influxdb:
 #   url: http://localhost:8086
 #   token: UzzK1e06v7oMVkXeTTbAlKjv0l6Kh7e7sGaWNWp3IkJUTE8RfTkhbYaUJ4tBNSdCAc74GgZHU02QCwDLHAxBBQ==
