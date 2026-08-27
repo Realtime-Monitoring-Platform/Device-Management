@@ -9,6 +9,7 @@ on:
 env:
   IMAGE_NAME: chedlyrebai/device-service
 
+
 jobs:
   build:
     name: Build
