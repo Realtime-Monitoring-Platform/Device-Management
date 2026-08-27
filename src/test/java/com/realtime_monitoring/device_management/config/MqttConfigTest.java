@@ -16,12 +16,12 @@ import javax.net.ssl.SSLContext;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-    "mqtt.broker=ssl://192.168.1.122:8883",
-    "mqtt.client-id=test-client",
-    "mqtt.topic=devices/+/metrics",
-    "mqtt.qos=1"
-})
+// @TestPropertySource(properties = {
+//     "mqtt.broker=ssl://192.168.1.122:8883",
+//     "mqtt.client-id=test-client",
+//     "mqtt.topic=devices/+/metrics",
+//     "mqtt.qos=1"
+// })
 class MqttConfigTest {
 
     @Autowired
