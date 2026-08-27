@@ -8,7 +8,9 @@ on:
 
 env:
   IMAGE_NAME: chedlyrebai/device-service
-
+  MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
+  MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
+  MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
 jobs:
 
   build:
@@ -52,8 +54,18 @@ jobs:
             -U postgres \
             -d device_management
 
-      
+      - name: Prepare MQTT certificates
+        run: |
+          mkdir -p /opt/mqtt/certs
+          echo "${{ secrets.MQTT_CA_CERT }}" > /opt/mqtt/certs/ca.crt
+          echo "${{ secrets.MQTT_CLIENT_CERT }}" > /opt/mqtt/certs/client.crt
+          echo "${{ secrets.MQTT_CLIENT_KEY }}" > /opt/mqtt/certs/client.key
+          chmod 600 /opt/mqtt/certs/client.key
       - name: Build
+        env:
+          MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
+          MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
+          MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
         run: mvn -B clean verify -Dspring.profiles.active=test
 
   

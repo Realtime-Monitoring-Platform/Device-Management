@@ -22,7 +22,7 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -49,10 +49,14 @@ import java.util.Date;
 
 @Service
 public class CertificateService {
+        @Value("${pki.ca-cert}")
+        private String caCertPath;
+        @Value("${pki.ca-key}")
+        private String caKeyPath;
 
-        private static final String CA_CERT_PATH = "C:/mqtt/backend/ca/ca.crt";
+       // private static final String CA_CERT_PATH = "C:/mqtt/backend/ca/ca.crt";
 
-        private static final String CA_KEY_PATH = "C:/mqtt/backend/ca/ca.key";
+       // private static final String CA_KEY_PATH = "C:/mqtt/backend/ca/ca.key";
 
         public String signCsr(
                         String csrPem,
@@ -64,13 +68,13 @@ public class CertificateService {
 
                 System.out.println("Device ID: " + deviceId);
 
-                X509Certificate caCertificate = loadCertificate(CA_CERT_PATH);
+                X509Certificate caCertificate = loadCertificate(caCertPath);
 
                 System.out.println("CA certificate loaded.");
 
                 System.out.println("CA subject: " + caCertificate.getSubjectX500Principal());
 
-                PrivateKey caPrivateKey = loadPrivateKey(CA_KEY_PATH);
+                PrivateKey caPrivateKey = loadPrivateKey(caKeyPath);
 
                 System.out.println("CA private key loaded.");
 

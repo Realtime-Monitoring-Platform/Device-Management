@@ -50,12 +50,12 @@ mqtt:
     logs-topic: tenants/+/devices/+/logs
     command-results-topic: tenants/+/devices/+/command-results
     qos: 1 
-    ca-cert: C:/mqtt/backend/ca.crt
-    client-cert: C:/mqtt/backend/backend.crt
-    client-key: C:/mqtt/backend/backend.key
+    ca-cert: ${MQTT_CA_CERT:C:/mqtt/backend/ca.crt}
+    client-cert: ${MQTT_CLIENT_CERT:C:/mqtt/backend/backend.crt}
+    client-key: ${MQTT_CLIENT_KEY:C:/mqtt/backend/backend.key}
 pki:
-  ca-cert: C:/mqtt/backend/ca/ca.crt
-  ca-key: C:/mqtt/backend/ca/ca.key
+  ca-cert: ${MQTT_CA_CERT:C:/mqtt/backend/ca/ca.crt}
+  ca-key: ${MQTT_CA_KEY:C:/mqtt/backend/ca/ca.key}
 #   ca-cert: C:\mqtt\backend\ca.crt
 #   client-cert: C:\mqtt\backend\backend.crt
 #   client-key: C:\mqtt\backend\backend.key
