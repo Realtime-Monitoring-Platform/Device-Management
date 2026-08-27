@@ -54,8 +54,7 @@ jobs:
 
       
       - name: Build
-        run: |
-          mvn -B clean verify
+        run: mvn -B clean verify -Dspring.profiles.active=test
 
   
   sonarqube:
@@ -126,16 +125,14 @@ jobs:
 
       - name: Generate image tag
         id: version
-        run: |
-          echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+        run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
