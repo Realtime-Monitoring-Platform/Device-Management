@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
     "mqtt.topic=devices/+/metrics",
     "mqtt.qos=1"
 })
-@ActiveProfiles("test")
+
 class MqttConfigTest {
 
     @Autowired
