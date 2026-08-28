@@ -1,0 +1,14 @@
+# Build context hygiene for Spring Boot services
+target
+.git
+.github
+.vscode
+.idea
+*.iml
+*.log
+*.md
+HELP.md
+Dockerfile
+.dockerignore
+.env
+.DS_Store
