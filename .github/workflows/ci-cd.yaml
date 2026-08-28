@@ -1,195 +1,195 @@
-name: device-service
+  name: device-service
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+  on:
+    push:
+      branches: ["main"]
+    pull_request:
+      branches: ["main"]
 
-env:
-  IMAGE_NAME: chedlyrebai/device-service
-  MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
-  MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
-  MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
-jobs:
+  env:
+    IMAGE_NAME: chedlyrebai/device-service
+    MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
+    MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
+    MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
+  jobs:
 
-  build:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: device_management
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: chedly
+    build:
+      name: Build and Test
+      runs-on: ubuntu-latest
+      services:
+        postgres:
+          image: postgres:16
+          env:
+            POSTGRES_DB: device_management
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: chedly
 
-        ports:
-          - 5432:5432
+          ports:
+            - 5432:5432
 
-        options: >-
-          --health-cmd="pg_isready -U postgres -d device_management"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          options: >-
+            --health-cmd="pg_isready -U postgres -d device_management"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=5
 
-    steps:
+      steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          cache: maven
+        - name: Setup Java
+          uses: actions/setup-java@v4
+          with:
+            java-version: "21"
+            distribution: "temurin"
+            cache: maven
 
-      
-      - name: Check PostgreSQL
-        run: |
-          pg_isready \
-            -h localhost \
-            -p 5432 \
-            -U postgres \
-            -d device_management
+        
+        - name: Check PostgreSQL
+          run: |
+            pg_isready \
+              -h localhost \
+              -p 5432 \
+              -U postgres \
+              -d device_management
 
-      - name: Prepare MQTT certificates
-        run: |
-          mkdir -p /opt/mqtt/certs
-          echo "${{ secrets.MQTT_CA_CERT }}" > /opt/mqtt/certs/ca.crt
-          echo "${{ secrets.MQTT_CLIENT_CERT }}" > /opt/mqtt/certs/client.crt
-          echo "${{ secrets.MQTT_CLIENT_KEY }}" > /opt/mqtt/certs/client.key
-          chmod 600 /opt/mqtt/certs/client.key
-      - name: Build
-        env:
-          MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
-          MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
-          MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
-        run: mvn -B clean package
+        - name: Prepare MQTT certificates
+          run: |
+            mkdir -p /opt/mqtt/certs
+            echo "${{ secrets.MQTT_CA_CERT }}" > /opt/mqtt/certs/ca.crt
+            echo "${{ secrets.MQTT_CLIENT_CERT }}" > /opt/mqtt/certs/client.crt
+            echo "${{ secrets.MQTT_CLIENT_KEY }}" > /opt/mqtt/certs/client.key
+            chmod 600 /opt/mqtt/certs/client.key
+        - name: Build
+          env:
+            MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
+            MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
+            MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
+          run: mvn -B clean package -DskipTests
 
-  
-  sonarqube:
-    name: SonarCloud Analysis
-    runs-on: ubuntu-latest
-    needs: build
+    
+    sonarqube:
+      name: SonarCloud Analysis
+      runs-on: ubuntu-latest
+      needs: build
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          cache: maven
+        - name: Setup Java
+          uses: actions/setup-java@v4
+          with:
+            java-version: "21"
+            distribution: "temurin"
+            cache: maven
 
-      - name: SonarCloud Analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B verify sonar:sonar \
-            -Dsonar.organization=realtime-monitoring-platform \
-            -Dsonar.projectKey=Realtime-Monitoring-Platform_Device-Management \
-            -Dsonar.projectName=Device-Management \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=$SONAR_TOKEN
+        - name: SonarCloud Analysis
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          run: |
+            mvn -B verify sonar:sonar \
+              -Dsonar.organization=realtime-monitoring-platform \
+              -Dsonar.projectKey=Realtime-Monitoring-Platform_Device-Management \
+              -Dsonar.projectName=Device-Management \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.token=$SONAR_TOKEN
 
-  
-  # trivy-fs-scan:
-  #   name: Trivy Filesystem Scan
-  #   runs-on: ubuntu-latest
-  #   needs: build
+    
+    # trivy-fs-scan:
+    #   name: Trivy Filesystem Scan
+    #   runs-on: ubuntu-latest
+    #   needs: build
 
-  #   steps:
+    #   steps:
 
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    #     - name: Checkout code
+    #       uses: actions/checkout@v4
 
-  #     - name: Trivy filesystem scan
-  #       uses: aquasecurity/trivy-action@0.35.0
-  #       with:
-  #         scan-type: fs
-  #         scan-ref: .
-  #         severity: CRITICAL,HIGH
-  #         ignore-unfixed: true
-  #         exit-code: "1"
-  docker-build:
-    name: Docker Build
-    runs-on: ubuntu-latest
+    #     - name: Trivy filesystem scan
+    #       uses: aquasecurity/trivy-action@0.35.0
+    #       with:
+    #         scan-type: fs
+    #         scan-ref: .
+    #         severity: CRITICAL,HIGH
+    #         ignore-unfixed: true
+    #         exit-code: "1"
+    docker-build:
+      name: Docker Build
+      runs-on: ubuntu-latest
 
-    needs:
-      - build
-      - sonarqube
-      # - trivy-fs-scan
+      needs:
+        - build
+        - sonarqube
+        # - trivy-fs-scan
 
-    steps:
+      steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        - name: Setup Docker Buildx
+          uses: docker/setup-buildx-action@v3
 
-      - name: Generate image tag
-        id: version
-        run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+        - name: Generate image tag
+          id: version
+          run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        - name: Build Docker image
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            load: true
+            tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
 
-      # - name: Trivy Docker image scan
-      #   uses: aquasecurity/trivy-action@0.36.0
-      #   with:
-      #     image-ref: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
-      #     severity: CRITICAL,HIGH
-      #     ignore-unfixed: true
-      #     exit-code: "1"
+        # - name: Trivy Docker image scan
+        #   uses: aquasecurity/trivy-action@0.36.0
+        #   with:
+        #     image-ref: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
+        #     severity: CRITICAL,HIGH
+        #     ignore-unfixed: true
+        #     exit-code: "1"
 
-  docker-push:
-    name: Push Docker Image
-    runs-on: ubuntu-latest
+    docker-push:
+      name: Push Docker Image
+      runs-on: ubuntu-latest
 
-    needs:
-      - docker-build
+      needs:
+        - docker-build
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    steps:
+      steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        - name: Setup Docker Buildx
+          uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+        - name: Login to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Generate image tag
-        id: version
-        run: |
-          echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+        - name: Generate image tag
+          id: version
+          run: |
+            echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
-            ${{ env.IMAGE_NAME }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        - name: Build and push Docker image
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            push: true
+            tags: |
+              ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG }}
+              ${{ env.IMAGE_NAME }}:latest
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
