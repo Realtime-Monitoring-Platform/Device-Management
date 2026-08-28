@@ -12,11 +12,29 @@ env:
   MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
   MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
 jobs:
+
   build:
-    name: Build
+    name: Build and Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: device_management
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: chedly
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd="pg_isready -U postgres -d device_management"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -27,62 +45,28 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Build
-        run: mvn -B clean package
-  # build:
-  #   name: Build and Test
-  #   runs-on: ubuntu-latest
-  #   services:
-  #     postgres:
-  #       image: postgres:16
-  #       env:
-  #         POSTGRES_DB: device_management
-  #         POSTGRES_USER: postgres
-  #         POSTGRES_PASSWORD: chedly
-
-  #       ports:
-  #         - 5432:5432
-
-  #       options: >-
-  #         --health-cmd="pg_isready -U postgres -d device_management"
-  #         --health-interval=10s
-  #         --health-timeout=5s
-  #         --health-retries=5
-
-  #   steps:
-
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: "21"
-  #         distribution: "temurin"
-  #         cache: maven
-
       
-  #     - name: Check PostgreSQL
-  #       run: |
-  #         pg_isready \
-  #           -h localhost \
-  #           -p 5432 \
-  #           -U postgres \
-  #           -d device_management
+      - name: Check PostgreSQL
+        run: |
+          pg_isready \
+            -h localhost \
+            -p 5432 \
+            -U postgres \
+            -d device_management
 
-  #     - name: Prepare MQTT certificates
-  #       run: |
-  #         mkdir -p /opt/mqtt/certs
-  #         echo "${{ secrets.MQTT_CA_CERT }}" > /opt/mqtt/certs/ca.crt
-  #         echo "${{ secrets.MQTT_CLIENT_CERT }}" > /opt/mqtt/certs/client.crt
-  #         echo "${{ secrets.MQTT_CLIENT_KEY }}" > /opt/mqtt/certs/client.key
-  #         chmod 600 /opt/mqtt/certs/client.key
-  #     - name: Build
-  #       env:
-  #         MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
-  #         MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
-  #         MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
-  #       run: mvn -B clean package
+      - name: Prepare MQTT certificates
+        run: |
+          mkdir -p /opt/mqtt/certs
+          echo "${{ secrets.MQTT_CA_CERT }}" > /opt/mqtt/certs/ca.crt
+          echo "${{ secrets.MQTT_CLIENT_CERT }}" > /opt/mqtt/certs/client.crt
+          echo "${{ secrets.MQTT_CLIENT_KEY }}" > /opt/mqtt/certs/client.key
+          chmod 600 /opt/mqtt/certs/client.key
+      - name: Build
+        env:
+          MQTT_CA_CERT: /opt/mqtt/certs/ca.crt
+          MQTT_CLIENT_CERT: /opt/mqtt/certs/client.crt
+          MQTT_CLIENT_KEY: /opt/mqtt/certs/client.key
+        run: mvn -B clean package
 
   
   sonarqube:
