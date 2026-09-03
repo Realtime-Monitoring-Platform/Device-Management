@@ -22,17 +22,33 @@ import java.util.Base64;
 @Configuration
 public class MqttSslConfig {
 
-    @Value("${mqtt.ca-cert}")
+    @Value("${mqtt.ssl-enabled:false}")
+    private boolean sslEnabled;
+
+    @Value("${mqtt.ca-cert:/etc/mqtt/certs/ca.crt}")
     private String caCertPath;
 
-    @Value("${mqtt.client-cert}")
+    @Value("${mqtt.client-cert:/etc/mqtt/certs/client.crt}")
     private String clientCertPath;
 
-    @Value("${mqtt.client-key}")
+    @Value("${mqtt.client-key:/etc/mqtt/certs/client.key}")
     private String clientKeyPath;
 
     @Bean
     public SSLContext mqttSslContext() throws Exception {
+
+        if (!sslEnabled) {
+            // Plaintext mode (local dev / docker compose): we still return a
+            // usable SSLContext because MqttClientFactoryConfig always calls
+            // setSocketFactory(getSocketFactory()). A default TLS context is
+            // enough here - its SocketFactory only creates plain sockets, so a
+            // tcp:// broker (e.g. the dockerized Mosquitto) works fine.
+            // This avoids loading the client certs from host-specific paths
+            // (C:/mqtt/backend/...) which do not exist inside the container.
+            SSLContext plain = SSLContext.getInstance("TLS");
+            plain.init(null, null, null);
+            return plain;
+        }
 
         // ==========================================
         // CA CERTIFICATE
