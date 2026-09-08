@@ -40,11 +40,9 @@ public class DeviceServiceimp implements DeviceService {
         private final DeviceProducer deviceProducer;
         private final DeviceTokenRepository deviceTokenRepo;
         private final CertificateService certificateService;
-        @Value("${pki.ca-cert}")
-        private String caCertPath;
-        @Value("${pki.ca-key}")
-        private String caKeyPath;
 
+        @Value("${pki.ca-cert:C:/mqtt/backend/ca/ca.crt}")
+        private String caCertPath;
         // private final CertificateService certificateService;
         @Override
         public DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest) {
@@ -146,6 +144,7 @@ public class DeviceServiceimp implements DeviceService {
                 System.out.println("CPU Count: " + device.getCpuCount());
                 System.out.println("Total Memory (KB): " + device.getTotalMemoryKb());
                 System.out.println("Device info updated successfully.");
+                
 
                 if (provisionRequest == null || provisionRequest.getCsr() == null
                                 || provisionRequest.getCsr().isBlank()) {
@@ -159,25 +158,34 @@ public class DeviceServiceimp implements DeviceService {
 
                 try {
 
-                        String clientCertificate = certificateService.signCsr(csr, device.getId().toString());
+                        String clientCertificate = certificateService.signCsr(
+                                        csr,
+                                        device.getId().toString());
 
-                        System.out.println("Device certificate signed successfully.");
+                        System.out.println(
+                                        "Device certificate signed successfully.");
+//                         pki:
+//   ca-cert: C:/mqtt/backend/ca/ca.crt
+                        String caCertificate = Files.readString(
+                                        Path.of(
+                                                        caCertPath));
 
-                        // String caCertificate = Files.readString(
-                        // Path.of(
-                        // "C:/mqtt/backend/ca/ca.crt"));
-                        String caCertificate = Files.readString(Path.of(caCertPath));
                         ProvisionResponse response = new ProvisionResponse();
 
-                        response.setDeviceId(device.getId().toString());
+                        response.setDeviceId(
+                                        device.getId().toString());
 
-                        response.setTenantId(device.getTenantId().toString());
+                        response.setTenantId(
+                                        device.getTenantId().toString());
 
-                        response.setCaCertificate(caCertificate);
+                        response.setCaCertificate(
+                                        caCertificate);
 
-                        response.setClientCertificate(clientCertificate);
+                        response.setClientCertificate(
+                                        clientCertificate);
 
-                        System.out.println("Provisioning response created.");
+                        System.out.println(
+                                        "Provisioning response created.");
 
                         System.out.println("========================================");
 
