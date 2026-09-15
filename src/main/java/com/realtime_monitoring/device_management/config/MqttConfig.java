@@ -1,6 +1,9 @@
 package com.realtime_monitoring.device_management.config;
 
 import com.realtime_monitoring.device_management.dto.DeviceLogSSEService;
+
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +17,7 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtime_monitoring.device_management.dto.CommandResult;
 import com.realtime_monitoring.device_management.dto.DeviceLog;
@@ -22,6 +26,7 @@ import com.realtime_monitoring.device_management.service.DeviceCommandeService;
 import com.realtime_monitoring.device_management.service.DeviceLogMessage;
 import com.realtime_monitoring.device_management.service.DeviceLogService;
 import com.realtime_monitoring.device_management.service.DeviceService;
+import com.realtime_monitoring.device_management.service.IncidentDetectorService;
 import com.realtime_monitoring.device_management.service.MetricsService;
 
 @Configuration
@@ -44,7 +49,7 @@ public class MqttConfig {
 
     @Value("${mqtt.logs-topic}")
     private String logsTopic;
-
+    private final IncidentDetectorService incidentDetectorService;
     private final ObjectMapper objectMapper;
     private final MetricsService metricService;
     private final DeviceCommandeService deviceCommandeService;
@@ -53,8 +58,10 @@ public class MqttConfig {
     public MqttConfig(ObjectMapper objectMapper,
             MetricsService metricService,
             DeviceCommandeService deviceCommandeService,
-            DeviceLogService deviceLogService, DeviceLogSSEService deviceLogSSEService) {
+            DeviceLogService deviceLogService, DeviceLogSSEService deviceLogSSEService,
+            IncidentDetectorService incidentDetectorService) {
         this.objectMapper = objectMapper;
+        this.incidentDetectorService = incidentDetectorService;
         this.metricService = metricService;
         this.deviceCommandeService = deviceCommandeService;
         this.deviceLogService = deviceLogService;
@@ -139,50 +146,116 @@ public class MqttConfig {
                 .handle(message -> {
 
                     try {
+
                         String payload = message.getPayload().toString();
 
                         String receivedTopic = message.getHeaders()
                                 .get("mqtt_receivedTopic", String.class);
 
-                        // System.out.println("========================================");
-                        // System.out.println("MQTT LOGS RECEIVED");
-                        // System.out.println("Topic: " + receivedTopic);
-                        // System.out.println("Payload: " + payload);
-                        // System.out.println("========================================");
+                        System.out.println("========================================");
+                        System.out.println("MQTT LOGS RECEIVED");
+                        System.out.println("Topic: " + receivedTopic);
+                        System.out.println("Payload: " + payload);
+                        System.out.println("========================================");
 
-                        DeviceLogsMessage logsMessage = objectMapper.readValue(
-                                payload,
-                                DeviceLogsMessage.class);
+                        JsonNode root = objectMapper.readTree(payload);
 
-                        System.out.println("Device ID: " + logsMessage.getDeviceId());
-                        System.out.println("Tenant ID: " + logsMessage.getTenantId());
-                        System.out.println("Number of logs: "
-                                + logsMessage.getLogs().size());
+                        /*
+                         * ========================================
+                         * CASE 1: SINGLE LOG
+                         * ========================================
+                         */
+                        if (root.has("message") && !root.has("logs")) {
 
-                        for (DeviceLogMessage logMessage : logsMessage.getLogs()) {
+                            DeviceLogMessage logMessage = objectMapper.treeToValue(
+                                    root,
+                                    DeviceLogMessage.class);
 
-                            // System.out.println("----------------------------------------");
-                            // System.out.println("Device ID: " + logMessage.getDeviceId());
-                            // System.out.println("Tenant ID: " + logMessage.getTenantId());
-                            // System.out.println("Level: " + logMessage.getLevel());
-                            // System.out.println("Service: " + logMessage.getService());
-                            // System.out.println("Source: " + logMessage.getSource());
-                            // System.out.println("Message: " + logMessage.getMessage());
-                            // System.out.println("Timestamp: " + logMessage.getTimestamp());
+                            processDeviceLog(logMessage);
 
-                            deviceLogService.saveLog(logMessage);
-                            deviceLogSSEService.publish(logMessage.getDeviceId(),
-                                    logMessage);
+                            return;
                         }
 
-                        System.out.println("All device logs saved successfully.");
+                        /*
+                         * ========================================
+                         * CASE 2: BATCH OF LOGS
+                         * ========================================
+                         */
+                        if (root.has("logs")) {
+
+                            DeviceLogsMessage logsMessage = objectMapper.treeToValue(
+                                    root,
+                                    DeviceLogsMessage.class);
+
+                            System.out.println(
+                                    "Device ID: "
+                                            + logsMessage.getDeviceId());
+
+                            System.out.println(
+                                    "Tenant ID: "
+                                            + logsMessage.getTenantId());
+
+                            if (logsMessage.getLogs() == null ||
+                                    logsMessage.getLogs().isEmpty()) {
+
+                                System.out.println(
+                                        "No logs received for device: "
+                                                + logsMessage.getDeviceId());
+
+                                return;
+                            }
+
+                            System.out.println(
+                                    "Number of logs: "
+                                            + logsMessage.getLogs().size());
+
+                            for (DeviceLogMessage logMessage : logsMessage.getLogs()) {
+
+                                processDeviceLog(logMessage);
+                            }
+
+                            return;
+                        }
+
+                        System.out.println(
+                                "Unknown MQTT log payload format");
 
                     } catch (Exception e) {
-                        System.err.println("Failed to process MQTT log");
+
+                        System.err.println(
+                                "Failed to process MQTT log");
+
                         e.printStackTrace();
                     }
                 })
                 .get();
+    }
+
+    private void processDeviceLog(DeviceLogMessage logMessage) {
+
+        System.out.println("Processing log for device: " + logMessage.getDeviceId());
+        System.out.println("Tenant: " + logMessage.getTenantId());
+        System.out.println("Level: " + logMessage.getLevel());
+        System.out.println("Message: " + logMessage.getMessage());
+        deviceLogService.saveLog(logMessage);
+        DeviceLog log = new DeviceLog();
+
+        log.setDeviceId(logMessage.getDeviceId());
+        log.setTenantId(logMessage.getTenantId());
+        log.setLevel(logMessage.getLevel());
+        log.setMessage(logMessage.getMessage());
+
+        log.setDeviceTimestamp(Instant.ofEpochMilli(logMessage.getTimestamp()));
+
+        log.setReceivedAt(Instant.now());
+
+        incidentDetectorService.checkLogIncident(log);
+
+        deviceLogSSEService.publish(
+                logMessage.getDeviceId(),
+                logMessage);
+
+        System.out.println("device log saved successfully.");
     }
 
     @Bean

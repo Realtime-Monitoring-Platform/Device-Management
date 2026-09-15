@@ -1,5 +1,7 @@
 package com.realtime_monitoring.device_management.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,8 +13,10 @@ public interface DeviceLogService {
  
     Page<DeviceLog> getLogsByDevice(String deviceId, Pageable pageable);
  
+    
     Page<DeviceLog> getLogsByTenant(String tenantId, Pageable pageable);
  
     Page<DeviceLog> getLogsByDeviceAndLevel(String deviceId, String level, Pageable pageable);
+    List<DeviceLog> getRecentLogs(String deviceId, int minutes);
 }
  

@@ -3,6 +3,8 @@ package com.realtime_monitoring.device_management.config;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.integration.channel.DirectChannel;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtime_monitoring.device_management.dto.DeviceLogSSEService;
 import com.realtime_monitoring.device_management.service.DeviceCommandeService;
 import com.realtime_monitoring.device_management.service.DeviceLogService;
+import com.realtime_monitoring.device_management.service.IncidentDetectorService;
 import com.realtime_monitoring.device_management.service.MetricsService;
 
 /**
@@ -34,7 +37,8 @@ class MqttConfigTest {
                 mock(MetricsService.class),
                 mock(DeviceCommandeService.class),
                 mock(DeviceLogService.class),
-                mock(DeviceLogSSEService.class));
+                mock(DeviceLogSSEService.class),
+                mock(IncidentDetectorService.class));
 
         // Inject the @Value fields that Spring would normally resolve from the active properties.
         ReflectionTestUtils.setField(config, "clientId", "test-client");
@@ -84,5 +88,45 @@ class MqttConfigTest {
                 "mqttCommandResultsInbound should not be null");
         assertNotNull(config.mqttLogsInbound(config.mqttLogsChannel(), clientFactory),
                 "mqttLogsInbound should not be null");
+    }
+
+    @Test
+    void nullOrEmptyLogsAreIgnoredWithoutCallingLogService() throws Exception {
+        DeviceLogService logService = mock(DeviceLogService.class);
+        MqttConfig config = new MqttConfig(
+                new ObjectMapper(),
+                mock(MetricsService.class),
+                mock(DeviceCommandeService.class),
+                logService,
+                mock(DeviceLogSSEService.class),
+                mock(IncidentDetectorService.class));
+
+        // config.processLogPayload("{\"deviceId\":null,\"tenantId\":null,\"logs\":null}",
+        //         "tenants/t1/devices/d1/logs");
+        // config.processLogPayload("{\"deviceId\":\"d1\",\"tenantId\":\"t1\",\"logs\":[]}",
+        //         "tenants/t1/devices/d1/logs");
+
+        verify(logService, never()).saveLog(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void validLogsAreSavedAndPublished() throws Exception {
+        DeviceLogService logService = mock(DeviceLogService.class);
+        DeviceLogSSEService sseService = mock(DeviceLogSSEService.class);
+        MqttConfig config = new MqttConfig(
+                new ObjectMapper(),
+                mock(MetricsService.class),
+                mock(DeviceCommandeService.class),
+                logService,
+                sseService,
+                mock(IncidentDetectorService.class));
+
+        // config.processLogPayload(
+        //         "{\"deviceId\":\"d1\",\"tenantId\":\"t1\",\"logs\":[{\"device_id\":\"d1\",\"tenant_id\":\"t1\",\"level\":\"INFO\",\"message\":\"ok\",\"timestamp\":1700000000000}]}",
+        //         "tenants/t1/devices/d1/logs");
+
+        verify(logService).saveLog(org.mockito.ArgumentMatchers.any());
+        verify(sseService).publish(org.mockito.ArgumentMatchers.eq("d1"),
+                org.mockito.ArgumentMatchers.any());
     }
 }

@@ -46,12 +46,12 @@ public class DeviceLogSSEService {
         }
         for (SseEmitter emitter : deviceEmitters) {
             try {
-                System.out.println("========================================");
-                System.out.println("PUBLISHING LOG TO SSE");
-                System.out.println("Device ID: " + log.getDeviceId());
-                System.out.println("Tenant ID: " + log.getTenantId());
-                System.out.println("Level: " + log.getLevel());
-                System.out.println("Service: " + log.getService());
+                // System.out.println("========================================");
+                // System.out.println("PUBLISHING LOG TO SSE");
+                // System.out.println("Device ID: " + log.getDeviceId());
+                // System.out.println("Tenant ID: " + log.getTenantId());
+                // System.out.println("Level: " + log.getLevel());
+                // System.out.println("Service: " + log.getService());
                 emitter.send(SseEmitter.event().name("device-log").data(log));
             } catch (IOException e) {
                 remove(deviceId, emitter);

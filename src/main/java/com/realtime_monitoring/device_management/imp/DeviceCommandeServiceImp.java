@@ -52,9 +52,9 @@ public class DeviceCommandeServiceImp implements DeviceCommandeService {
     @Override
     @Transactional
     public void handleCommandResult(CommandResult result) {
-        System.out.println("Handling command result for commandId: " + result.getCommandId());
-        System.out.println("Status: " + result.getStatus());
-        System.out.println("Stdout: " + result.getStdout());
+        System.out.println("handle command result for commandId: " + result.getCommandId());
+        System.out.println("Status::::::::::" + result.getStatus());
+        System.out.println("Stdout: ::::" + result.getStdout());
         UUID commandId = UUID.fromString(result.getCommandId());
 
         DeviceCommand deviceCommand = deviceCommandRepository.findById(commandId)
@@ -72,7 +72,6 @@ public class DeviceCommandeServiceImp implements DeviceCommandeService {
         DeviceCommand saved = deviceCommandRepository.save(deviceCommand);
     }
 
-   
     @Override
     @Transactional
     public DeviceCommand getCommandById(UUID commandId) {

@@ -12,6 +12,7 @@ import com.realtime_monitoring.device_management.dto.ProvisionRequest;
 import com.realtime_monitoring.device_management.dto.ProvisionResponse;
 import com.realtime_monitoring.device_management.dto.UpdateDeviceRequest;
 
+
 public interface DeviceService {
     DeviceResponse CreateDevice(CreateDeviecRequest createDeviceRequest);
     void deleteDevice(UUID deviceId);
