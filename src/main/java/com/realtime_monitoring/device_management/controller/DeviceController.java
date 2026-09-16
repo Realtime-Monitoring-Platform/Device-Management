@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.tomcat.util.http.parser.Authorization;
@@ -124,6 +125,16 @@ public class DeviceController {
             @PageableDefault(page = 0, size = 50) Pageable pageable) {
 
         return ResponseEntity.ok(deviceLogService.getLogsByTenant(tenantId, pageable));
+    }
+
+    
+    @GetMapping("/{deviceId}/logs/recent")
+    public ResponseEntity<List<DeviceLog>> getRecentLogs(
+            @PathVariable String deviceId,
+            @RequestParam(defaultValue = "30") int minutes) {
+
+        return ResponseEntity.ok(
+                deviceLogService.getRecentLogs(deviceId, minutes));
     }
 
     // @GetMapping("/user/me")

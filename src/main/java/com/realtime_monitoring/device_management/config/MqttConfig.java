@@ -231,6 +231,7 @@ public class MqttConfig {
                 .get();
     }
 
+    
     private void processDeviceLog(DeviceLogMessage logMessage) {
 
         System.out.println("Processing log for device: " + logMessage.getDeviceId());
