@@ -34,13 +34,16 @@ public class DeviceCommand {
 
     private UUID tenantId;
 
+    
+    private UUID incidentId;
+
     @Enumerated(EnumType.STRING)
     private CommandStatus status;
 
     private UUID userId;
     @Column(columnDefinition = "TEXT")
     private String stdout;
-    
+    private boolean aiGenerated = false;
     private String command;
 
     @CreationTimestamp

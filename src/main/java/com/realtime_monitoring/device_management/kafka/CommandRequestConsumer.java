@@ -1,5 +1,6 @@
 package com.realtime_monitoring.device_management.kafka;
 
+import com.realtime_monitoring.device_management.entity.DeviceCommand;
 import com.realtime_monitoring.device_management.kafka.event.CommandRequestEvent;
 import com.realtime_monitoring.device_management.service.DeviceCommandeService;
 
@@ -15,19 +16,25 @@ import org.springframework.stereotype.Service;
 public class CommandRequestConsumer {
 
     
+    
     private final DeviceCommandeService deviceCommandeService;
 
     @KafkaListener(topics = "command-requests", groupId = "device-service-command-group", containerFactory = "commandRequestKafkaListenerContainerFactory")
     public void consume(CommandRequestEvent request) {
 
-        log.info("Received AI command: deviceId={}, command={}",
+        log.info("Received AI command: deviceId={}, tenantId={}, command={}",
                 request.deviceId(),
+            request.tenantId(),
                 request.command());
-
-        deviceCommandeService.createCommand(
+        //  DeviceCommand createAiCommand(
+        //     UUID deviceId,
+        //     UUID tenantId,
+        //     String command);
+        deviceCommandeService.createAiCommand(
+          //  request.incidentId(),
                 request.deviceId(),
                 request.tenantId(),
-                request.requestedBy(),
-                request.command());
+                request.command()
+                );
     }
 }

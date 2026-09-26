@@ -2,6 +2,8 @@ package com.realtime_monitoring.device_management.imp;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.eclipse.paho.client.mqttv3.internal.wire.MqttPublish;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,12 @@ import com.realtime_monitoring.device_management.service.DeviceCommandeService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 
 @Service
 @RequiredArgsConstructor
+@Slf4j 
 public class DeviceCommandeServiceImp implements DeviceCommandeService {
 
     private final DeviceCommandRepository deviceCommandRepository;
@@ -24,7 +29,87 @@ public class DeviceCommandeServiceImp implements DeviceCommandeService {
 
     @Override
     @Transactional
-    public DeviceCommand createCommand(UUID deviceId, UUID tenantId, UUID userId, String command) {
+    public DeviceCommand createCommand(
+            UUID deviceId,
+            UUID tenantId,
+            UUID userId,
+            String command,
+            boolean aiGenerated) {
+
+        DeviceCommand deviceCommand = new DeviceCommand();
+
+        deviceCommand.setDeviceId(deviceId);
+        deviceCommand.setTenantId(tenantId);
+        deviceCommand.setUserId(userId);
+        deviceCommand.setCommand(command);
+        deviceCommand.setAiGenerated(aiGenerated);
+        deviceCommand.setStatus(CommandStatus.PENDING);
+
+        DeviceCommand saved = deviceCommandRepository.save(deviceCommand);
+
+        try {
+            mqttPubLisher.sendCommand(
+                    tenantId,
+                    deviceId,
+                    saved.getId(),
+                    command);
+
+            saved.setStatus(CommandStatus.SENT);
+
+        } catch (Exception e) {
+            saved.setStatus(CommandStatus.FAILED);
+            System.err.println(e.getMessage());
+        }
+
+        return deviceCommandRepository.save(saved);
+    }
+
+    @Override
+    @Transactional
+    public DeviceCommand createAiCommand(
+            UUID deviceId,
+            UUID tenantId,
+            String command) {
+
+        DeviceCommand deviceCommand = new DeviceCommand();
+
+        deviceCommand.setDeviceId(deviceId);
+        deviceCommand.setTenantId(tenantId);
+        deviceCommand.setUserId(null);
+        deviceCommand.setAiGenerated(true);
+        deviceCommand.setCommand(command);
+        deviceCommand.setStatus(CommandStatus.PENDING);
+
+        DeviceCommand saved = deviceCommandRepository.save(deviceCommand);
+
+        try {
+
+            mqttPubLisher.sendCommand(
+                    tenantId,
+                    deviceId,
+                    saved.getId(),
+                    command);
+
+            saved.setStatus(CommandStatus.SENT);
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Failed to send AI command {} to device {}",
+                    saved.getId(),
+                    deviceId,
+                    e);
+
+            saved.setStatus(CommandStatus.FAILED);
+        }
+
+        return deviceCommandRepository.save(saved);
+    }
+
+    @Override
+    @Transactional
+    public DeviceCommand createCommand(UUID deviceId, UUID tenantId, UUID userId,
+            String command) {
 
         DeviceCommand deviceCommand = new DeviceCommand();
 
@@ -77,5 +162,11 @@ public class DeviceCommandeServiceImp implements DeviceCommandeService {
     public DeviceCommand getCommandById(UUID commandId) {
         return deviceCommandRepository.findById(commandId)
                 .orElseThrow(() -> new RuntimeException("Command not found: " + commandId));
+    }
+
+    @Override
+    @Transactional
+    public Page<DeviceCommand> getCommandsByDeviceId(UUID deviceId, Pageable pageable) {
+        return deviceCommandRepository.findByDeviceIdOrderByCreatedAtDesc(deviceId, pageable);
     }
 }

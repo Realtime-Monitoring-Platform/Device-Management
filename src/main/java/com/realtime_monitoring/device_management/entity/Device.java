@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Entity
 @Getter
 @Setter
@@ -38,21 +39,21 @@ public class Device {
 
     private UUID assignedUserId;
 
-    @Column(nullable = false)
+   // @Column(nullable = false)
     private String deviceName;
 
     private String model;
 
     private String manufacturer;
 
-    @Column(nullable = false)
+   // @Column(nullable = false)
     private String hostname;
 
     private String ipAddress;
 
     private String macAddress;
 
-    @Column(nullable = true, unique = true, updatable = false)
+    //@Column(nullable = true, unique = true, updatable = false)
     private String deviceIdentifier;
 
     private String location;

@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class DeviceServiceimp implements DeviceService {
 
+        
         private final DeviceRepository deviceRepository;
         private final DeviceMapper deviceMapper;
         private final DeviceProducer deviceProducer;

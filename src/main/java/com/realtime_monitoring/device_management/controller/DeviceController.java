@@ -89,12 +89,14 @@ public class DeviceController {
         return deviceService.provisionDevice(token, provisionRequest);
     }
 
-    @PostMapping("/{deviceId}/commands")
-    public ResponseEntity<DeviceCommand> execute(@PathVariable UUID deviceId, @RequestBody ExecuteCommand command,
+    
+    @PostMapping("/{deviceId}/commands/tenant/{tenantId}")
+    public ResponseEntity<DeviceCommand> execute(@PathVariable UUID tenantId,@PathVariable UUID deviceId,@RequestBody ExecuteCommand command,
             HttpServletRequest request) {
-
+//
         DeviceCommand deviceCommand = this.deviceCommandeService.createCommand(deviceId,
-                UUID.fromString(request.getHeader("X-User-Tenant-Id")), UUID.fromString(request.getHeader("X-User-Id")),
+                //UUID.fromString(request.getHeader("X-User-Tenant-Id"))
+                tenantId, UUID.fromString(request.getHeader("X-User-Id")),
                 command.getCommand());
         return ResponseEntity.ok(deviceCommand);
     }
@@ -102,6 +104,13 @@ public class DeviceController {
     @GetMapping("/commands/{commandId}")
     public ResponseEntity<DeviceCommand> getCommand(@PathVariable UUID commandId) {
         return ResponseEntity.ok(deviceCommandeService.getCommandById(commandId));
+    }
+
+    @GetMapping("/{deviceId}/commands/history")
+    public ResponseEntity<Page<DeviceCommand>> getCommandHistory(
+            @PathVariable UUID deviceId,
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return ResponseEntity.ok(deviceCommandeService.getCommandsByDeviceId(deviceId, pageable));
     }
 
     private final DeviceLogService deviceLogService;
