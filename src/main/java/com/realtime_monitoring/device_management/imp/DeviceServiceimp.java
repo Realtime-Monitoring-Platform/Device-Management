@@ -66,9 +66,11 @@ public class DeviceServiceimp implements DeviceService {
                 deviceToken.setDevice(savedDevice);
                 deviceToken.setToken(Generatedtoken);
                 this.deviceTokenRepo.save(deviceToken);
-
+                
                 deviceProducer.sendDeviceCreation(savedDevice);
-                return deviceMapper.toResponse(savedDevice);
+                DeviceResponse deviceRes=deviceMapper.toResponse(savedDevice);
+                deviceRes.setDeviceToken(Generatedtoken);
+                return deviceRes;
         }
 
         @Override
@@ -84,7 +86,12 @@ public class DeviceServiceimp implements DeviceService {
                 if (device.isEmpty()) {
                         throw new DeviceNotFoundException("device with ID " + deviceId + " not found");
                 }
+                
                 DeviceResponse deviceReponse = this.deviceMapper.toResponse(device.get());
+                Optional<DeviceToken> devicet = this.deviceTokenRepo.findByDeviceId(deviceId);
+                if(devicet.isPresent()){
+                        deviceReponse.setDeviceToken(devicet.get().getToken());
+                }
                 return deviceReponse;
         }
 

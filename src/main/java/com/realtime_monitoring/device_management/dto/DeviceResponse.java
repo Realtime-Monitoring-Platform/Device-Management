@@ -45,7 +45,7 @@ public class DeviceResponse {
     private String ipAddress;
     private String macAddress;
     private String location;
-
+    private String deviceToken;
     @Enumerated(EnumType.STRING)
     private DeviceStatus status;
 
